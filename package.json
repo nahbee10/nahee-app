@@ -2,30 +2,40 @@
   "name": "nahee-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://nahee.app",
   "dependencies": {
+    "axios": "^0.18.0",
+    "create-react-class": "^15.6.3",
+    "gh-pages": "^2.0.1",
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.21",
     "react": "^16.8.6",
+    "react-ace": "^6.4.0",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.0"
+    "react-draggable": "^3.2.1",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "2.1.8",
+    "terminal-in-react": "^4.3.1",
+    "webfontloader": "^1.6.28"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && cp build/index.html build/404.html",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject && cp CNAME build/CNAME",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {
+    "gh-pages": "^2.0.1"
   }
 }
