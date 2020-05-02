@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>nahee.app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="https://nahee.app/nk_favi.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background: #e0d6f1;
+            overflow:hidden;
+            text-rendering: optimizeLegibility;
+             -webkit-font-smoothing: antialiased;
+             font-family: 'Spectral', serif;
+             width: 100%;
+        }
+
+        a.link_web{
+            color:black;
+            text-decoration: none;
+        }
+        a.link_vid:hover{
+            color:black;
+        }
+        a.link_vid{
+            color:white;
+            background: black;
+            padding:1px 4px 1px 4px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        a.link_vid:hover{
+            color:black;
+            background: white;
+            border: 1px solid black;
+        }
+
+        .big_div2{
+            position: absolute;
+            top:0px;
+            overflow:hidden;
+            z-index: 100;
+            width: 100%;
+            height: 100%;
+        }
+
+        #photo_enlarge{
+            display: none;
+            width: 100%;
+            height:100%;
+            position: fixed;
+            top:0px;
+            left:0px;
+            z-index: 20000;
+        }
+        #photos_main{
+            margin: 0;
+            width: 70%;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              padding: 1%;
+              z-index: -1;
+        }
+        #photos_main2{
+            margin: 0;
+            width: 60%;
+              position: fixed;
+              top: 50%;
+              left: 36%;
+              /*transform: translate(-36%, -50%) rotate(-24deg);*/
+              padding: 1%;
+        }
+        .enlarged_photo{
+            width: 100%;
+        }
+
+        #main_bg{
+           width: auto;
+            height: 120%;
+        }
+        #main_layer{
+            width: 100%;
+        }
+        #canvas{
+            z-index: 50000;
+            display: none;
+        }
+        #project_content2{
+            padding: 19px;
+            font-size: 12px;
+            font-weight: 500;
+            width: 20%;
+            position: absolute;
+            top:6%;
+            right:9%;
+            background: #e0d6f1;
+            border: 1px solid black;
+            height: fit-content;
+            display: none;
+        }
+        #desc{
+            width: 100%;
+            height:100%;
+            position: fixed;
+            top: 0px;
+            bottom: 0px;
+            display: none;
+            z-index: 60000;
+        }
+        .project_title2{
+            font-size: 32px;
+            font-weight: 500;
+        }
+        .key_img{
+            height: 50%;
+        }
+        #key_combined_img{
+
+            width: 65%;
+        }
+        #key_combined_img2{
+            width: 100%;
+        }
+        .back{
+            width:20px;
+            position: fixed;
+            top:0px;
+            left: 0px;
+            height:100%;
+            line-break:anywhere;
+            word-break: break-all;
+            font-size:9px;
+            z-index: 4000;
+        }
+        .back_link{
+            color:black;
+            text-decoration-line: none;
+        }
+        #shade_div{
+            background: #e0d6f1;
+            opacity: 1;
+            position: fixed;
+            top:0px;
+            left:0px;
+            width: 100%;
+            height:100%;
+            z-index: 100000;
+        }
+        .shade_animation{
+            animation-name: shade;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+            animation-delay: 1s;
+        }
+        @keyframes shade {
+          from {opacity: 1;z-index: 100000;display: inherit;}
+          to {opacity: 0; z-index: -100;display: none;}
+        }
+        #table {
+
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #table2 {
+
+            width: 100%;
+            border-collapse: collapse;
+
+        }
+        #table_div{
+            width: 50%;
+            /*display:none;*/
+            overflow-y: scroll;
+            position:absolute;
+            top:0;
+            left:0;
+            font-size: 10px;
+            z-index: 30000;
+
+        }
+        th, td {
+          padding: 3%;
+          /*padding-left: px;*/
+          text-align: left;
+            border: 1px solid black; 
+            border-top:none;
+            border-left:none;
+            background-color: #e0d6f1;
+        
+        }
+        td:hover{
+            background-color: black;
+            color:white;
+
+        }
+
+        @media screen and (max-width: 600px) {
+            #table_div{
+                width: 100%;
+                position:relative;
+                display: none;
+            }
+            #photos_main{
+            margin: 0;
+              position: relative;
+              top: 0%;
+              left: 0%;
+              transform: inherit;
+              z-index: 1000000;
+              padding: 0%;
+              width: 100%;
+        }
+        #main_bg{
+            width: auto;
+            height: 100%;
+        }
+
+            .enlarged_photo_div{
+
+            width: 80%;
+        }
+            body {
+            overflow-y:scroll;
+            overflow-x:hidden;
+           
+        }
+          .photos_popup{
+                width:100%;
+                margin-top: -40%;
+            }
+
+        #project_content2{
+            position: fixed;
+            bottom: 20%;
+            width: 75%;
+            padding: 24px;
+            font-size: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 60000;
+        }
+
+        .big_div2{
+            position: relative;
+            /*height: 100%;*/
+            overflow: scroll;
+            width: 100%;
+            left: 0px;
+        }
+        #photo_stack{
+            margin-top: auto;
+            overflow: hidden;
+        }
+        
+        }
+    </style>
+</head>
+<body>
+
+        <div class="big_div2">
+        <div id="photos_main">
+        <img src="handshake_erotica.png" id="main_bg" />
+        </div>
+        <div id="table_div">
+            <table id="table">
+          <tr>
+            <td><img src="keys/ephemeral_a_public.png" class="key_img"></td>
+            <td><img src="keys/ephemeral_b_public.png" class="key_img"></td>
+            <td><img src="keys/ephemeral_a_secret.png" class="key_img"></td>
+          </tr>
+          <tr>
+            <td><img src="keys/ephemeral_b_secret.png" class="key_img"></td>
+            <td><img src="keys/long_a_public.png" class="key_img"></td>
+            <td><img src="keys/long_b_public.png" class="key_img"></td>
+          </tr>
+          <tr>
+            <td><img src="keys/long_a_secret.png" class="key_img"></td>
+            <td><img src="keys/long_b_secret.png" class="key_img"></td>
+            <td><img src="keys/n.png" class="key_img"></td>
+          </tr>
+          <tr>
+            <td><img src="keys/ephemeral_a_ephemeral_b.png" class="key_img"></td>
+            <td><img src="keys/ephemeral_a_long_b.png" class="key_img"></td>
+            <td><img src="keys/long_a_ephemeral_b.png" class="key_img"></td>
+          </tr>
+        </table>
+        <table id="table2">
+          <tr>
+            <td><img src="keys/combined_1_before.png" id="key_combined_img"></td>
+          </tr>
+          <tr>
+            <td style="border-bottom: none;"><img src="keys/combined_2_before.png" id="key_combined_img2"></td>
+          </tr>
+        </table>
+        </div>
+        
+        <div id="photos_main2">
+        <img src="web_transparency-02.png" id="main_layer" style="display: none" />
+        </div>
+        
+
+        <div id="desc">
+        <div id="project_content2">
+        <div class="project_title2">Torrents of Sex</div>/*
+
+        Assuming that someday human can upload and download their somatic sensations onto the web, Nahee.app designed peer-to-peer polyamorous sexual relationship network protocol &lt;Torrents of Sex&gt;, inspired by BitTorrent’s file distribution & peer selection algorithms.<br>
+        &lt;Torrents of Sex&gt; was exhibited at Our Networks 2019 and Cybernetics Library @ NY Art Book Fair 2019.
+*/
+<br><br>
+</div>
+
+
+
+
+</div>   
+
+
+    </div>
+    <div class="back">
+<a href="../" class="back_link">◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎</a>
+</div>
+<div id="shade_div"></div>
+    <script type="text/javascript">
+
+        //const container = document.querySelector('.project_content2');
+        var shade = document.getElementById("shade_div");
+        var photos_main = document.getElementById("photos_main");
+        var main_bg = document.getElementById("main_bg");
+        var main_layer = document.getElementById("main_layer");
+            shade.style.width = window.innerWidth +"px";
+            shade.style.height = window.innerHeight+"px";
+        var table_div = document.getElementById("table_div");
+        table_div.style.height = window.innerHeight + "px";
+        photos_main.style.height = window.innerHeight + "px";
+
+        function codeAddress() {
+            
+            shade.classList.add("shade_animation");
+            
+        }
+        window.onload = codeAddress;
+
+    </script>
+</body>
+</html>
