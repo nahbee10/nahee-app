@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background: #e0d6f1;
+            overflow:hidden;
+            text-rendering: optimizeLegibility;
+             -webkit-font-smoothing: antialiased;
+             font-family: 'Spectral', serif;
+             width: 100%;
+        }
+
+        a.link_web{
+            color:black;
+            text-decoration: none;
+        }
+        a.link_vid:hover{
+            color:black;
+        }
+        a.link_vid{
+            color:white;
+            background: black;
+            padding:1px 4px 1px 4px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        a.link_vid:hover{
+            color:black;
+            background: white;
+            border: 1px solid black;
+        }
+
+        .big_div2{
+            position: absolute;
+            top:0px;
+            left:14%;
+            z-index: 100;
+            width: 86%;
+        }
+
+        #photo_enlarge{
+            display: none;
+            width: 100%;
+            height:100%;
+            position: fixed;
+            top:0px;
+            left:0px;
+            z-index: 20000;
+        }
+        .enlarged_photo_div{
+            margin: 0;
+            width: 64%;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              background: #e0d6f1;
+              padding: 1%;
+              border:1px solid black;
+        }
+        .enlarged_photo{
+            width: 100%;
+        }
+        .photos_popup{
+            padding: 12px;
+            border: 1px solid black;
+            /*position: absolute;*/
+            width:35%;
+            margin-top:-26%;
+            transform: rotateY(90deg);
+            background: #e0d6f1;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            animation-name: skew_css;
+        }
+
+        .popup_photo{
+            width: 100%;
+        }
+        #photo_stack{
+            margin-top: 50%;
+            height: 100%;
+            width: 100%;
+        }
+        .project_content2{
+            padding: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            width: 30%;
+            position: absolute;
+            top:50%;
+            right:14%;
+            background: #e0d6f1;
+        }
+        .project_title2{
+            font-size: 32px;
+            font-weight: 500;
+        }
+        .small_menu{
+            padding-left: 14px;
+            display: none;
+        }
+        .submenu{
+            cursor : pointer;
+        }
+        .gal_prev{
+            width: 100px;
+            height:100px;
+            margin: 0;
+              position: absolute;
+              top: 50%;
+              left: 10%;
+              font-family: sans-serif;
+              font-size: 9px;
+              transform: rotate(-90deg) translate(0%, 50%);
+            text-align: center;
+            cursor: pointer;
+        }
+        .gal_next{
+            width: 100px;
+            height:100px;
+            margin: 0;
+              position: absolute;
+              top: 50%;
+              right: 10%;
+              font-family: sans-serif;
+              font-size: 9px;
+              transform: rotate(90deg) translate(0%, 50%);
+            text-align: center;
+            cursor: pointer;
+        }
+        .back{
+            width:20px;
+            position: fixed;
+            top:0px;
+            left: 0px;
+            height:100%;
+            line-break:anywhere;
+            word-break: break-all;
+            font-size:9px;
+        }
+        .back_link{
+            color:black;
+            text-decoration-line: none;
+        }
+        #shade_div{
+            background: #e0d6f1;
+            opacity: 1;
+            position: fixed;
+            top:0px;
+            left:0px;
+            z-index: 100000;
+        }
+        .shade_animation{
+            animation-name: shade;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+            animation-delay: .5s;
+        }
+        @keyframes shade {
+          from {opacity: 1;z-index: 100000;display: inherit;}
+          to {opacity: 0; z-index: -100;display: none;}
+        }
+        @media screen and (max-width: 600px) {
+
+            .gal_prev{
+
+              left: 0%;
+              transform: rotate(-90deg) translate(50%, 5%);
+        }
+        .gal_next{
+
+              right: 0%;
+              transform: rotate(90deg) translate(-50%, 5%);
+        }
+
+            .enlarged_photo_div{
+
+            width: 80%;
+        }
+            body {
+            overflow-y:scroll;
+            overflow-x:hidden;
+           
+        }
+          .photos_popup{
+                width:100%;
+                margin-top: -40%;
+            }
+
+        .project_content2{
+            border: 1px solid black;
+            top: auto;
+            right: auto;
+            width: 75%;
+            padding: 24px;
+            font-size: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .big_div2{
+            position: relative;
+            /*height: 100%;*/
+            width: 100%;
+            left: 0px;
+        }
+        #photo_stack{
+            margin-top: auto;
+            overflow: hidden;
+        }
+        
+        }
+    </style>
+</head>
+<body>
+
+    <div class="big_div2">
+
+        <div id="photo_stack">
+        <div class="photos_popup" onclick="enlarge(1)">
+        <img src="dr_img_3_s.jpg" class="popup_photo" />
+        </div>
+        <div class="photos_popup" onclick="enlarge(2)">
+        <img src="dr_img_2_s.jpg" class="popup_photo" />
+        </div>
+        <div class="photos_popup" onclick="enlarge(3)">
+        <img src="daddy_illustration_tan_s-01_s.png" class="popup_photo" />
+        </div>
+        <div class="photos_popup" onclick="enlarge(4)">
+        <img src="dr_img_1_s.jpg" class="popup_photo" />
+        </div>
+        <div class="photos_popup" onclick="enlarge(5)">
+        <img src="sehwa_nahee_run_daddy_app_s.jpg" class="popup_photo" />
+        </div>
+        <div class="photos_popup" onclick="enlarge(6)">
+        <img src="dr_img_4_s.jpg" class="popup_photo" />
+        </div>
+        
+        <div class="project_content2">
+        <div class="project_title2">daddy residency</div>/*
+
+        I plan to have a baby after seven years by artificial insemination. <br>And I'd like to have a variety of companions for that rigorous but invaluable parenting experience. So I’m launching this open call for daddy residents who want to raise the baby with me for a certain amount of time. The application deadline is 07.31.2025. <br>
+With the project &lt;Daddy Residency&gt;, I’d like to initiate conversations about the necessity and possibility of designing my family structure. Since I think the existing ‘normal’ family structure consisted of one male adult, one female adult, and children follows the legacy of heteronormative patriarchy. <br>
+&lt;Daddy Residency&gt; was first introduced in the online exhibition at <a href="http://externalpages.org/#naheekim" target="_blank" class="link_web" style="text-decoration: underline;">External Pages</a>.
+*/
+<br><br>
+<div><a href="http://daddy-residency.com" target="_blank" class="link_web">|-website</a></div>
+<div class="submenu" onclick="openSubSubMenu(1)">|-what is daddy residency?
+<div class="small_menu">a short video explaining offerings and requirements of daddy residency<br><a href="https://youtu.be/efzO_lpcyY4" target="_blank" class="link_vid">watch</a>
+</div>
+</div>
+<div class="submenu" onclick="openSubSubMenu(2)">|-nahee run daddy.app
+<div class="small_menu">Nahee had a chat with daddy.app which is a virtual agent helping Nahee's baby plan<br><a href="https://youtu.be/FcfFsGD1lT4" target="_blank" class="link_vid">watch</a></div>
+</div>
+<div class="submenu" onclick="openSubSubMenu(3)">|-oo-genesis
+<div class="small_menu">Nahee recalls the beginning of the idea of daddy residency in a speculative world where nahee.app exists as a data descendant of human Nahee<br><a href="https://youtu.be/IJ23D1M_Hp8" target="_blank" class="link_vid">watch</a></div>
+</div>
+
+</div>   
+<div class="back">
+<a href="Tadpoles.html" class="back_link">◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎</a>
+</div>
+
+
+        </div>
+    </div>
+    <div id="photo_enlarge" onclick="enlargeDismiss()">
+    
+        <div class="enlarged_photo_div">
+         <img src="" class="enlarged_photo"/>
+        </div>
+        <div class="gal_prev" onclick="goPrev()">▲<br>prev</div>
+    <div class="gal_next" onclick="goNext()">▲<br>next</div>     
+    </div>
+    <div id="shade_div"></div>
+    <script type="text/javascript">
+        var enlarge_div = document.getElementById('photo_enlarge');
+        const container = document.querySelector('.project_content2');
+        var shade = document.getElementById("shade_div");
+            shade.style.width = window.innerWidth +"px";
+            shade.style.height = window.innerHeight+"px";
+        if (window.innerWidth < 600){
+                var v = container.offsetTop;
+                v = v*(-1) + container.offsetHeight + 40 + 148;
+                document.getElementsByClassName('big_div2')[0].style.height = v+"px";
+                container.style.right = (window.innerWidth - container.offsetWidth)*0.5 + "px";
+                container.style.top = window.innerHeight + 48 + "px";
+            }
+        function codeAddress() {
+            
+            shade.classList.add("shade_animation");
+            
+        }
+        window.onload = codeAddress;
+
+
+        var photos_container_arr = document.getElementsByClassName('photos_popup');
+        var skew_arr_x = [];
+        var skew_arr_y = [];
+        for (var i = 0; i < photos_container_arr.length; i++) {
+            var ran_rY = Math.random()*90 + 45;
+            skew_arr_y.push(ran_rY);
+            var ran_rX = Math.random()*90 + 45;
+            skew_arr_x.push(ran_rX);
+            photos_container_arr[i].style.transform = "skewY("+ran_rY+"deg) skewX("+ran_rX+"deg)";
+        }
+        function openSubSubMenu(n){
+            var small_menu = document.getElementsByClassName("small_menu")[n-1];
+            console.log(small_menu.style.display);
+            if (small_menu.style.display=="inherit"){
+                small_menu.style.display = "none";
+            }else{
+                small_menu.style.display = "inherit";
+            }
+        }
+
+        var cur_img_index;
+        var click_on_arrow = false;
+        var img_arr = ['dr_img_3.jpg','dr_img_2.jpg','daddy_illustration_tan_s-01.png','dr_img_1.jpg','sehwa_nahee_run_daddy_app.jpg','dr_img_4.jpg'];
+
+        function enlarge(n){
+            cur_img_index = n-1;
+            enlarge_div.style.display ="inherit";
+            enlarge_div.firstElementChild.firstElementChild.src = img_arr[cur_img_index];
+
+        }
+        function goPrev(){
+            click_on_arrow = true;
+            cur_img_index = cur_img_index-1;
+            if (cur_img_index<0){
+                cur_img_index = img_arr.length-1;
+            }
+            enlarge_div.firstElementChild.firstElementChild.src = img_arr[cur_img_index];
+        }
+        function goNext(){
+            click_on_arrow = true;
+            cur_img_index = cur_img_index+1;
+            if (cur_img_index>img_arr.length-1){
+                cur_img_index = 0;
+            }
+            enlarge_div.firstElementChild.firstElementChild.src = img_arr[cur_img_index];
+        }
+        function enlargeDismiss(){
+            if (!click_on_arrow){
+                enlarge_div.style.display ="none";
+                
+            }else{
+                click_on_arrow = false;
+            }
+            
+        }
+
+
+    </script>
+</body>
+</html>

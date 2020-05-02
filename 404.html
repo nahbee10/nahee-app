@@ -1,1 +1,627 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="shortcut icon" href="/nk_favi.png"/><link href="https://fonts.googleapis.com/css?family=Spectral:400,400i,700,700i" rel="stylesheet"><link href="https://fonts.googleapis.com/css?family=Padauk:400,700&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css?family=Akronim|Srisakdi&display=swap" rel="stylesheet"><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><link rel="manifest" href="/manifest.json"/><title>Nahee Kim</title><link href="/static/css/2.0ea46288.chunk.css" rel="stylesheet"><link href="/static/css/main.b12b6573.chunk.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div><script>!function(l){function e(e){for(var r,t,n=e[0],o=e[1],u=e[2],f=0,i=[];f<n.length;f++)t=n[f],p[t]&&i.push(p[t][0]),p[t]=0;for(r in o)Object.prototype.hasOwnProperty.call(o,r)&&(l[r]=o[r]);for(s&&s(e);i.length;)i.shift()();return c.push.apply(c,u||[]),a()}function a(){for(var e,r=0;r<c.length;r++){for(var t=c[r],n=!0,o=1;o<t.length;o++){var u=t[o];0!==p[u]&&(n=!1)}n&&(c.splice(r--,1),e=f(f.s=t[0]))}return e}var t={},p={1:0},c=[];function f(e){if(t[e])return t[e].exports;var r=t[e]={i:e,l:!1,exports:{}};return l[e].call(r.exports,r,r.exports,f),r.l=!0,r.exports}f.m=l,f.c=t,f.d=function(e,r,t){f.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},f.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},f.t=function(r,e){if(1&e&&(r=f(r)),8&e)return r;if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;var t=Object.create(null);if(f.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var n in r)f.d(t,n,function(e){return r[e]}.bind(null,n));return t},f.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return f.d(r,"a",r),r},f.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},f.p="/";var r=window.webpackJsonp=window.webpackJsonp||[],n=r.push.bind(r);r.push=e,r=r.slice();for(var o=0;o<r.length;o++)e(r[o]);var s=n;a()}([])</script><script src="/static/js/2.94caf5c4.chunk.js"></script><script src="/static/js/main.65afff0c.chunk.js"></script></body></html>
+<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="style.css"><script type="text/javascript" src="paper-full.min.js"></script><script type="text/paperscript" canvas="canvas">// Adapted from Flocking Processing example by Daniel Schiffman:
+        // http://processing.org/learning/topics/flocking.html
+
+        //outer.subtract(inner);
+        var colors = ['red', 'green', 'blue', 'black'];
+        var Boid = Base.extend({
+            initialize: function(position, maxSpeed, maxForce) {
+                var strength = Math.random() * 0.5;
+                this.acceleration = new Point();
+                this.vector = Point.random() * 2 + 1;
+                this.position = position.clone();
+                this.radius = 30;
+                this.maxSpeed = maxSpeed + strength;
+                this.maxForce = maxForce + strength;
+                this.amount = strength * 10 + 10;
+                this.count = 0;
+                this.createItems();
+            },
+
+            run: function(boids) {
+                this.lastLoc = this.position.clone();
+                this.flock(boids);
+               // if (!groupTogether) {
+               //     this.flock(boids);
+               // } else {
+               // this.flock2(boids);
+
+                    //this.align(boids);
+               // }
+                this.borders();
+                this.update();
+                this.calculateTail();
+                this.moveHead();
+            },
+            run2: function(boids) {
+                this.lastLoc = this.position.clone();
+                this.flock2(boids);
+                this.borders();
+                this.update();
+                this.calculateTail();
+                this.moveHead();
+            },
+
+            calculateTail: function() {
+                var segments = this.path.segments,
+                    shortSegments = this.shortPath.segments;
+                var speed = this.vector.length;
+                var pieceLength = 5 + speed / 3;
+                var point = this.position;
+
+                segments[0].point = shortSegments[0].point = point;
+                // Chain goes the other way than the movement
+                var lastVector = -this.vector;
+                for (var i = 1; i < this.amount; i++) {
+                    var vector = segments[i].point - point;
+                    this.count += speed * 10;
+                    var wave = Math.sin((this.count + i * 3) / 300);
+                    var sway = lastVector.rotate(90).normalize(wave);
+                    point += lastVector.normalize(pieceLength) + sway;
+                    segments[i].point = point;
+                    if (i < 3)
+                        shortSegments[i].point = point;
+                    lastVector = vector;
+                }
+                this.path.smooth();
+            },
+
+            createItems: function() {
+
+                this.head = new Shape.Ellipse({
+                    center: [0, 0],
+                    size: [6, 4],
+                    fillColor: 'black'
+                });
+
+                this.path = new Path({
+                    strokeColor: 'black',
+                    strokeWidth: 1,
+                    strokeCap: 'round'
+                });
+                for (var i = 0; i < this.amount; i++)
+                    this.path.add(new Point());
+
+                this.shortPath = new Path({
+                    strokeColor: 'black',
+                    strokeWidth: 2,
+                    strokeCap: 'round'
+                });
+                for (var i = 0; i < Math.min(3, this.amount); i++)
+                    this.shortPath.add(new Point());
+            },
+
+            moveHead: function() {
+                this.head.position = this.position;
+                this.head.rotation = this.vector.angle;
+            },
+
+            // We accumulate a new acceleration each time based on three rules
+            flock: function(boids) {
+                var separation = this.separate(boids) * 3;
+                var alignment = this.align(boids);
+                var cohesion = this.cohesion(boids);
+                this.acceleration += separation + alignment + cohesion;
+            },
+            flock2: function(boids) {
+                var separation = this.separate(boids);
+                var alignment = this.align(boids);
+                var cohesion = this.cohesion(boids);
+                this.acceleration += separation + alignment + cohesion;
+            },
+
+            update: function() {
+                // Update velocity
+                this.vector += this.acceleration;
+                // Limit speed (vector#limit?)
+                this.vector.length = Math.min(this.maxSpeed, this.vector.length);
+                this.position += this.vector;
+                // Reset acceleration to 0 each cycle
+                this.acceleration = new Point();
+            },
+
+            seek: function(target) {
+                this.acceleration += this.steer(target, false);
+            },
+
+            arrive: function(target) {
+                this.acceleration += this.steer(target, true);
+            },
+
+            borders: function() {
+                var vector = new Point();
+                var position = this.position;
+                var radius = this.radius;
+                var size = view.size;
+                if (position.x < -radius) vector.x = size.width + radius;
+                if (position.y < -radius) vector.y = size.height + radius;
+                if (position.x > size.width + radius) vector.x = -size.width -radius;
+                if (position.y > size.height + radius) vector.y = -size.height -radius;
+                if (!vector.isZero()) {
+                    this.position += vector;
+                    var segments = this.path.segments;
+                    for (var i = 0; i < this.amount; i++) {
+                        segments[i].point += vector;
+                    }
+                }
+            },
+
+            // A method that calculates a steering vector towards a target
+            // Takes a second argument, if true, it slows down as it approaches
+            // the target
+            steer: function(target, slowdown) {
+                var steer,
+                    desired = target - this.position;
+                    <!-- console.log(target); -->
+                    
+                
+                var distance = desired.length;
+                // Two options for desired vector magnitude
+                // (1 -- based on distance, 2 -- maxSpeed)
+                
+                if (slowdown && distance < 200) {
+                    // This damping is somewhat arbitrary:
+                    
+                    desired.length = this.maxSpeed * (distance / 100);
+                } else {
+                    desired.length = this.maxSpeed;
+                }
+
+                
+                if (distance<10){
+                  //console.log("desired.length1",desired.length);
+                    if (groupTogether) {
+                    //desired.angle = desired.angle - 90;
+
+                    } 
+                    //console.log("desired.angle",desired.angle);
+                }
+                steer = desired - this.vector;
+                //console.log("steer1",steer);
+               // steer.angle = 0;
+                //console.log("steer2",steer);
+                steer.length = Math.min(this.maxForce, steer.length);
+                return steer;
+            },
+
+            separate: function(boids) {
+                var desiredSeperation = 60;
+                var steer = new Point();
+                var count = 0;
+                // For every boid in the system, check if it's too close
+                for (var i = 0, l = boids.length; i < l; i++) {
+                    var other = boids[i];
+                    var vector = this.position - other.position;
+                    var distance = vector.length;
+                    if (distance > 0 && distance < desiredSeperation) {
+                        // Calculate vector pointing away from neighbor
+                        steer += vector.normalize(1 / distance);
+                        count++;
+                    }
+                }
+                // Average -- divide by how many
+                if (count > 0)
+                    steer /= count;
+                if (!steer.isZero()) {
+                    // Implement Reynolds: Steering = Desired - Velocity
+                    steer.length = this.maxSpeed;
+                    steer -= this.vector;
+                    steer.length = Math.min(steer.length, this.maxForce);
+                }
+                return steer;
+            },
+
+            // Alignment
+            // For every nearby boid in the system, calculate the average velocity
+            align: function(boids) {
+                var neighborDist = 25;
+                var steer = new Point();
+                var count = 0;
+                for (var i = 0, l = boids.length; i < l; i++) {
+                    var other = boids[i];
+                    var distance = this.position.getDistance(other.position);
+                    if (distance > 0 && distance < neighborDist) {
+                        steer += other.vector;
+                        count++;
+                    }
+                }
+
+                if (count > 0)
+                    steer /= count;
+                if (!steer.isZero()) {
+                    // Implement Reynolds: Steering = Desired - Velocity
+                    steer.length = this.maxSpeed;
+                    steer -= this.vector;
+                    steer.length = Math.min(steer.length, this.maxForce);
+                }
+                return steer;
+            },
+
+            // Cohesion
+            // For the average location (i.e. center) of all nearby boids,
+            // calculate steering vector towards that location
+            cohesion: function(boids) {
+                var neighborDist = 100;
+                var sum = new Point();
+                var count = 0;
+                for (var i = 0, l = boids.length; i < l; i++) {
+                    var other = boids[i];
+                    var distance = this.position.getDistance(other.position);
+                    if (distance > 0 && distance < neighborDist) {
+                        sum += other.position; // Add location
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    sum /= count;
+                    // Steer towards the location
+                    return this.steer(sum, false);
+                }
+                return sum;
+            }
+        });
+
+        var boids = [];
+        var groupTogether = false;
+
+        // Add the boids:
+        for (var i = 0; i < 10; i++) {
+            var position = Point.random() * view.size;
+            boids.push(new Boid(position, 10, 0.05));
+        }
+
+
+
+        var selectedPath;
+        var hs_test = false;
+        var big_rect;
+        var link;
+        var mouseMoveCheck = false;
+        var turnOffCheck = false;
+        var isMobile = false;
+
+        var ran_angle1 = Math.random()* 2 * Math.PI/3;
+        var ran_angle2 = Math.random()* 2 * Math.PI/3 + 2 * Math.PI/3;
+        var ran_angle3 = Math.random()* 2 * Math.PI/3 + 4 * Math.PI/3;
+
+        var max_rad;
+        var wh_ratio;
+        if (view.size.height>=view.size.width){
+            max_rad = view.size.width;
+            wh_ratio = view.size.height/view.size.width;
+            isMobile = true;
+        }else{
+
+            max_rad = view.size.height;
+            wh_ratio = view.size.width/view.size.height;
+            isMobile = false;
+        }
+
+        var ran_radius1 = Math.random()*max_rad*0.5/4;
+        var ran_radius2 = (Math.random()*max_rad*0.5/4) + max_rad*0.5*3/8;
+        var ran_radius3 = (Math.random()*max_rad*0.5/4) + max_rad*0.5*3/4;
+
+        
+        var ranX1 = ran_radius1 * Math.cos(ran_angle1) + view.size.width*0.5;
+        if (isMobile){
+            ran_radius1 = ran_radius1*wh_ratio*0.8;
+        }
+        var ranY1 = ran_radius1 * Math.sin(ran_angle1) + view.size.height*0.5;
+        
+        if (ranX1 > view.size.width-80){
+         ranX1 = view.size.width-80;
+        }
+        if (ranY1 > view.size.height-80){
+         ranY1 = view.size.height-80;
+        }
+
+        //var ranX1 = (Math.random()*(view.size.width - 200)) + 100;
+        //var ranY1 = (Math.random()*(view.size.height - 200)) + 100;
+
+        var point_hs = new Point(ranX1, ranY1);
+
+        var ranX2 = ran_radius2 * Math.cos(ran_angle2) + view.size.width*0.5;
+        if (isMobile){
+            ran_radius2 = ran_radius2*wh_ratio*0.8;
+        }
+        var ranY2 = ran_radius2 * Math.sin(ran_angle2) + view.size.height*0.5;
+        
+        if (ranX2 > view.size.width-80){
+         ranX2 = view.size.width-80;
+        }
+        if (ranY2 > view.size.height-80){
+         ranY2 = view.size.height-80;
+        }
+
+        //var ranX2 = (Math.random()*(view.size.width - 200)) + 100;
+        //var ranY2 = (Math.random()*(view.size.height - 200)) + 100;
+
+        var point_to = new Point(ranX2, ranY2);
+
+        var ranX3 = ran_radius3 * Math.cos(ran_angle3) + view.size.width*0.5;
+
+        if (isMobile){
+            ran_radius3 = ran_radius3*wh_ratio*0.8;
+        }
+        var ranY3 = ran_radius3 * Math.sin(ran_angle3) + view.size.height*0.5;
+
+        console.log(ran_radius3);
+
+        if (ranX3 > view.size.width-80){
+         ranX3 = view.size.width-80;
+        }
+        if (ranY3 > view.size.height-80){
+         ranY3 = view.size.height-80;
+        }
+
+        //var ranX3 = (Math.random()*(view.size.width - 200)) + 100;
+        //var ranY3 = (Math.random()*(view.size.height - 200)) + 100;
+
+        /* handshake erotica */
+
+        var egg_outline_hs = new Path.Circle(point_hs, 67.5);
+        egg_outline_hs.dashArray = [3, 2];
+        egg_outline_hs.strokeWidth = 1;
+        egg_outline_hs.strokeColor = "black";
+        egg_outline_hs.opacity = 0;
+
+        var raster_hs = new Raster('handshakeErotica');
+        raster_hs.position = point_hs;
+        raster_hs.scale(0.2);
+
+        var mask_hs = new Path.Circle(point_hs, 50);
+        mask_hs.fillColor = '#e9e9ff';
+        mask_hs.selected = true;
+
+        var group = new Group(mask_hs,raster_hs);
+        group.clipped = true;
+
+        var cover_hs = new Path.Circle(point_hs, 50);
+        cover_hs.opacity = 1;
+        cover_hs.fillColor = '#e0d6f1';
+
+        var orbit_hs = new Path.Circle(point_hs, 60);
+        orbit_hs.fillColor = '#e0d6f1';
+        orbit_hs.opacity = 0.01;
+        orbit_hs.onMouseEnter = function(event) {
+            egg_outline_hs.opacity = 1;
+            cover_hs.opacity = 0.1;
+            egg_outline_to.opacity = .01;
+            cover_to.opacity = 1;
+            egg_outline_dr.opacity = .01;
+            cover_dr.opacity = 1;
+            selectedPath = this;
+            mouseMoveCheck = true;
+            turnOffCheck = true;
+            document.querySelector("canvas").style.cursor = "pointer";
+            //group.bringToFront();
+        }
+
+        orbit_hs.onMouseLeave = function(event) {
+            egg_outline_hs.opacity = 0;
+            cover_hs.opacity = 1;
+            selectedPath = undefined;
+            mouseMoveCheck = false;
+            turnOffCheck = false;
+            document.querySelector("canvas").style.cursor = "default";
+            //group.sendToBack();
+        }
+        orbit_hs.onClick = function(event) {
+             
+            link="Tadpoles4.html";
+            createRect();
+            hs_test = true;
+
+             
+        }
+
+        var text = new PointText(point_hs);
+        text.fillColor = 'black';
+        text.fontSize = '9px';
+
+        // Set the content of the text item:
+        //text.content = 'Handshake Erotica';
+
+        /* handshake erotica */
+
+        /* torrents of sex */
+
+        var egg_outline_to = new Path.Circle(point_to, 67.5);
+        egg_outline_to.dashArray = [3, 2];
+        egg_outline_to.strokeWidth = 1;
+        egg_outline_to.strokeColor = "black";
+        egg_outline_to.opacity = 0;
+
+        var raster_to = new Raster('torrentsOfSex');
+        raster_to.position = point_to;
+        raster_to.scale(0.2);
+
+        var mask_to = new Path.Circle(point_to, 50);
+        mask_to.fillColor = '#e9e9ff';
+        mask_to.selected = true;
+
+        var group2 = new Group(mask_to,raster_to);
+        group2.clipped = true;
+
+        var cover_to = new Path.Circle(point_to, 50);
+        cover_to.opacity = 1;
+        cover_to.fillColor = '#e0d6f1';
+
+        var orbit_to = new Path.Circle(point_to, 60);
+        orbit_to.fillColor = '#e0d6f1';
+        orbit_to.opacity = 0.01;
+        orbit_to.onMouseEnter = function(event) {
+            egg_outline_to.opacity = 1;
+            cover_to.opacity = 0.1;
+            egg_outline_hs.opacity = .01;
+            cover_hs.opacity = 1;
+            egg_outline_dr.opacity = .01;
+            cover_dr.opacity = 1;
+            selectedPath = this;
+            mouseMoveCheck = true;
+            turnOffCheck = true;
+            document.querySelector("canvas").style.cursor = "pointer";
+            //group2.bringToFront();
+        }
+
+        orbit_to.onMouseLeave = function(event) {
+            egg_outline_to.opacity = 0;
+            cover_to.opacity = 1;
+            selectedPath = undefined;
+            mouseMoveCheck = false;
+            turnOffCheck = false;
+            document.querySelector("canvas").style.cursor = "default";
+            //group2.sendToBack();
+        }
+        orbit_to.onClick = function(event) {
+             link="Tadpoles3.html";
+             createRect();
+             hs_test = true;
+        }
+
+        /* torrents of sex */
+
+        /* daddy residency */
+
+        var point_dr = new Point(ranX3, ranY3);
+
+        var egg_outline_dr = new Path.Circle(point_dr, 67.5);
+        egg_outline_dr.dashArray = [3, 2];
+        egg_outline_dr.strokeWidth = 1;
+        egg_outline_dr.strokeColor = "black";
+        egg_outline_dr.opacity = 0;
+
+        var raster_dr = new Raster('daddyResidency');
+        raster_dr.position = point_dr;
+        raster_dr.scale(0.2);
+
+        var mask_dr = new Path.Circle(point_dr, 50);
+        mask_dr.fillColor = '#e9e9ff';
+        mask_dr.selected = true;
+
+        var group3 = new Group(mask_dr,raster_dr);
+        group3.clipped = true;
+
+        var cover_dr = new Path.Circle(point_dr, 50);
+        cover_dr.opacity = 1;
+        cover_dr.fillColor = '#e0d6f1';
+
+        var orbit_dr = new Path.Circle(point_dr, 60);
+        orbit_dr.fillColor = '#e0d6f1';
+        orbit_dr.opacity = 0.01;
+        orbit_dr.onMouseEnter = function(event) {
+            egg_outline_dr.opacity = 1;
+            cover_dr.opacity = 0.1;
+            egg_outline_to.opacity = .01;
+            cover_to.opacity = 1;
+            egg_outline_hs.opacity = .01;
+            cover_hs.opacity = 1;
+            selectedPath = this;
+            mouseMoveCheck = true;
+            turnOffCheck = true;
+            document.querySelector("canvas").style.cursor = "pointer";
+            //group3.bringToFront();
+        }
+
+        orbit_dr.onMouseLeave = function(event) {
+            egg_outline_dr.opacity = 0;
+            cover_dr.opacity = 1;
+            selectedPath = undefined;
+            mouseMoveCheck = false;
+            turnOffCheck = false;
+            document.querySelector("canvas").style.cursor = "default";
+            //group3.sendToBack();
+        }
+        orbit_dr.onClick = function(event) {
+             link="Tadpoles2.html";
+             createRect();
+             hs_test = true;
+        }
+
+        /* daddy residency */
+
+        
+        function createRect(){
+            var from = new Point(0, 0);
+        var to = new Point(view.size.width, view.size.height);
+        var shape = new Shape.Rectangle(from, to);
+        shape.fillColor = '#e0d6f1';
+        shape.opacity = 0;
+        shape.bringToFront();
+        big_rect = shape;
+        }
+
+        function onFrame(event) {
+            if (!mouseMoveCheck){
+                var checker = (Math.floor(event.time/5))%3
+                //console.log(5%3);
+                if (checker == 0){
+                selectedPath = orbit_dr;
+                egg_outline_to.opacity = .01;
+                cover_to.opacity = 1;
+                egg_outline_hs.opacity = .01;
+                cover_hs.opacity = 1;
+                egg_outline_dr.opacity = 1;
+                cover_dr.opacity = .01;
+
+                }else if(checker == 1){
+                selectedPath = orbit_to;
+                egg_outline_to.opacity = 1;
+                cover_to.opacity = 0.01;
+                egg_outline_hs.opacity = .01;
+                cover_hs.opacity = 1;
+                egg_outline_dr.opacity = .01;
+                cover_dr.opacity = 1;
+
+                }else if(checker == 2){
+                selectedPath = orbit_hs;
+                egg_outline_to.opacity = .01;
+                cover_to.opacity = 1;
+                egg_outline_hs.opacity = 1;
+                cover_hs.opacity = .01;
+                egg_outline_dr.opacity = .01;
+                cover_dr.opacity = 1;
+                }
+            }
+            
+
+            for (var i = 0, l = 10; i < l; i++) {
+                if ((selectedPath != undefined)) {
+                    if (i<10){
+                        var length = ((i + event.count / 30) % 10) / 10 * selectedPath.length;
+                        var point = selectedPath.getPointAt(length);
+                        //console.log(point);
+                        if (point)
+                            boids[i].arrive(point);
+                        boids[i].run2(boids);
+                    }else{
+                        boids[i].run(boids);
+                    }
+                    
+                }else{
+                    boids[i].run(boids);
+                }
+                if(hs_test){
+
+                
+                if (big_rect.opacity > 0.99){
+                    mask_hs.selected = false;
+                    mask_to.selected = false;
+                    mask_dr.selected = false;
+                    project.clear();
+                    window.location.href=link;
+                    hs_test= false;
+
+                }else{
+                    big_rect.opacity += .005; 
+                }
+                }
+                
+                
+            } 
+
+        }
+        // Reposition the heart path whenever the window is resized:
+        function onResize(event) {
+           // heartPath.fitBounds(view.bounds);
+           // heartPath.scale(0.8);
+        }</script><style>body{background:#fff;overflow:hidden}#canvas{z-index:700}canvas[resize]{width:100%;height:100%}svg{z-index:600;position:absolute;top:30px;left:30px;fill:red}.circle{width:200px;height:200px;position:fixed;top:220px;left:400px;border-radius:120px;border:1px dashed #000;background:#e0d6f1;padding:20px}.s_circle{width:200px;height:200px;border-radius:100px;border:1px solid #000;background:#e0d6f1}.maskedImg{display:none}#shade_div{background:#e0d6f1;opacity:1;position:fixed;top:0;left:0;z-index:10000000}.shade_animation{animation-name:shade;animation-duration:1s;animation-delay:1s;animation-fill-mode:forwards}@keyframes shade{from{opacity:1;z-index:10000000}to{opacity:0;z-index:-100}}#intro{width:80%;height:80%;position:fixed;top:10%;left:10%;font-size:14px;opacity:0;animation-name:intro_shade;animation-duration:1s;animation-delay:1s;animation-fill-mode:forwards}@keyframes intro_shade{from{opacity:0;display:none}to{opacity:1;display:inherit}}#back{width:18px;position:absolute;bottom:0;right:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;z-index:1000000}#insta{width:18px;position:absolute;bottom:0;left:0;line-break:anywhere;word-break:break-all;font-size:11px;cursor:pointer;z-index:1000000;line-height:9px}#github{width:18px;position:absolute;bottom:0;left:25px;line-break:anywhere;word-break:break-all;font-size:11px;cursor:pointer;z-index:1000000;line-height:9px}.back_link{color:#000;text-decoration-line:none}#edit{width:24px;position:absolute;bottom:0;right:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;display:none}#cv{width:25px;position:absolute;bottom:0;left:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;display:none}a{text-decoration:none;color:#000}</style><link href="/static/css/2.0ea46288.chunk.css" rel="stylesheet"><link href="/static/css/main.e7b29e1f.chunk.css" rel="stylesheet"></head><body style="background:#e0d6f1"><div id="root" style="display:none"></div><div id="shade_div"></div><div style="position:relative;border-bottom:1px solid #000;height:100%"><canvas id="canvas" resize></canvas><img src="handshake_erotica_s.png" id="handshakeErotica" class="maskedImg"> <img src="web_l-02_s.png" id="torrentsOfSex" class="maskedImg"> <img src="daddy_illustration_tan_s-01_s.png" id="daddyResidency" class="maskedImg"></div><div id="edit" onclick="openIntro()">edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit edit</div><a id="cv" href="naheekim__cv_2020.pdf" target="_blank">openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV openCV</a><div id="intro">import NaheeApp from ‘nahee’<br><br>var App = NaheeApp.createPortfolio({<br>getIntroduction: function () {<br><br>/*<br>Nahee Kim(she/they) is an artist, teacher, and web programmer whose performing “nahee.app” in social media. “nahee.app” was started from pseudo programs which interpret Nahee’s sexual identity, preference, and experiences as algorithms. “nahee.app” creates sex docs by tweaking existing network protocols’ communication mechanism into provocative interactions, speculative sex toys and matching applications. For now running “Daddy Residency” which is an experiment to seek new approaches of building family. Nahee is based in New York and Seoul.<br>*/<br><br>},<div id="back" onclick="closeIntro()">✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕✕</div><a href="https://www.instagram.com/nahee.app/" id="insta" target="_blank">instagram </a><a href="https://github.com/nahbee10/nahee.app" id="github" target="_blank">github</a></div><script type="text/javascript">function codeAddress(){var e=document.getElementById("shade_div");e.style.width=window.innerWidth+"px",e.style.height=window.innerHeight+"px",e.classList.add("shade_animation")}function closeIntro(){document.getElementById("intro").style.display="none",document.getElementById("edit").style.display="inherit",document.getElementById("cv").style.display="inherit"}function openIntro(){document.getElementById("intro").style.display="inherit",document.getElementById("edit").style.display="none",document.getElementById("cv").style.display="none"}window.addEventListener("pageshow",function(e){(e.persisted||void 0!==window.performance&&2===window.performance.navigation.type)&&window.location.reload()}),window.onload=codeAddress</script><script>!function(l){function e(e){for(var r,t,n=e[0],o=e[1],u=e[2],f=0,i=[];f<n.length;f++)t=n[f],p[t]&&i.push(p[t][0]),p[t]=0;for(r in o)Object.prototype.hasOwnProperty.call(o,r)&&(l[r]=o[r]);for(s&&s(e);i.length;)i.shift()();return c.push.apply(c,u||[]),a()}function a(){for(var e,r=0;r<c.length;r++){for(var t=c[r],n=!0,o=1;o<t.length;o++){var u=t[o];0!==p[u]&&(n=!1)}n&&(c.splice(r--,1),e=f(f.s=t[0]))}return e}var t={},p={1:0},c=[];function f(e){if(t[e])return t[e].exports;var r=t[e]={i:e,l:!1,exports:{}};return l[e].call(r.exports,r,r.exports,f),r.l=!0,r.exports}f.m=l,f.c=t,f.d=function(e,r,t){f.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},f.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},f.t=function(r,e){if(1&e&&(r=f(r)),8&e)return r;if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;var t=Object.create(null);if(f.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var n in r)f.d(t,n,function(e){return r[e]}.bind(null,n));return t},f.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return f.d(r,"a",r),r},f.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},f.p="/";var r=window.webpackJsonp=window.webpackJsonp||[],n=r.push.bind(r);r.push=e,r=r.slice();for(var o=0;o<r.length;o++)e(r[o]);var s=n;a()}([])</script><script src="/static/js/2.94caf5c4.chunk.js"></script><script src="/static/js/main.65afff0c.chunk.js"></script></body></html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300;1,400;1,500&display=swap" rel="stylesheet">
+
+    <script type="text/javascript" src="paper-full.min.js"></script>
+    <script type="text/paperscript" canvas="canvas">
+    var Boid = Base.extend({
+        initialize: function(position, maxSpeed, maxForce) {
+            var strength = Math.random() * 0.5;
+            this.acceleration = new Point();
+            this.vector = Point.random() * 2 - 1;
+            this.position = position.clone();
+            this.radius = 30;
+            this.maxSpeed = maxSpeed + strength;
+            this.maxForce = maxForce + strength;
+            this.amount = strength * 10 + 10;
+            this.count = 0;
+            this.createItems();
+        },
+
+        run: function(boids) {
+            this.lastLoc = this.position.clone();
+            if (!groupTogether) {
+                this.flock(boids);
+            } else {
+                this.align(boids);
+            }
+            this.borders();
+            this.update();
+            this.calculateTail();
+            this.moveHead();
+        },
+
+        calculateTail: function() {
+            var segments = this.path.segments,
+                shortSegments = this.shortPath.segments;
+            var speed = this.vector.length;
+            var pieceLength = 5 + speed / 3;
+            var point = this.position;
+            segments[0].point = shortSegments[0].point = point;
+            // Chain goes the other way than the movement
+            var lastVector = -this.vector;
+            for (var i = 1; i < this.amount; i++) {
+                var vector = segments[i].point - point;
+                this.count += speed * 10;
+                var wave = Math.sin((this.count + i * 3) / 300);
+                var sway = lastVector.rotate(90).normalize(wave);
+                point += lastVector.normalize(pieceLength) + sway;
+                segments[i].point = point;
+                if (i < 3)
+                    shortSegments[i].point = point;
+                lastVector = vector;
+            }
+            this.path.smooth();
+        },
+
+        createItems: function() {
+            this.head = new Shape.Ellipse({
+                    center: [0, 0],
+                    size: [6, 4],
+                    fillColor: 'black'
+                });
+
+                this.path = new Path({
+                    strokeColor: 'black',
+                    strokeWidth: 1,
+                    strokeCap: 'round'
+                });
+                for (var i = 0; i < this.amount; i++)
+                    this.path.add(new Point());
+
+                this.shortPath = new Path({
+                    strokeColor: 'black',
+                    strokeWidth: 2,
+                    strokeCap: 'round'
+                });
+                for (var i = 0; i < Math.min(3, this.amount); i++)
+                    this.shortPath.add(new Point());
+        },
+
+        moveHead: function() {
+            this.head.position = this.position;
+            this.head.rotation = this.vector.angle;
+        },
+
+        // We accumulate a new acceleration each time based on three rules
+        flock: function(boids) {
+            var separation = this.separate(boids) * 3;
+            var alignment = this.align(boids);
+            var cohesion = this.cohesion(boids);
+            this.acceleration += separation + alignment + cohesion;
+        },
+
+        update: function() {
+            // Update velocity
+            this.vector += this.acceleration;
+            // Limit speed (vector#limit?)
+            this.vector.length = Math.min(this.maxSpeed, this.vector.length);
+            this.position += this.vector;
+            // Reset acceleration to 0 each cycle
+            this.acceleration = new Point();
+        },
+
+        seek: function(target) {
+            this.acceleration += this.steer(target, false);
+        },
+
+        arrive: function(target) {
+            this.acceleration += this.steer(target, true);
+        },
+
+        borders: function() {
+            var vector = new Point();
+            var position = this.position;
+            var radius = this.radius;
+            var size = view.size;
+            if (position.x < -radius) vector.x = size.width + radius;
+            if (position.y < -radius) vector.y = size.height + radius;
+            if (position.x > size.width + radius) vector.x = -size.width -radius;
+            if (position.y > size.height + radius) vector.y = -size.height -radius;
+            if (!vector.isZero()) {
+                this.position += vector;
+                var segments = this.path.segments;
+                for (var i = 0; i < this.amount; i++) {
+                    segments[i].point += vector;
+                }
+            }
+        },
+
+        // A method that calculates a steering vector towards a target
+        // Takes a second argument, if true, it slows down as it approaches
+        // the target
+        steer: function(target, slowdown) {
+            var steer,
+                desired = target - this.position;
+            var distance = desired.length;
+            // Two options for desired vector magnitude
+            // (1 -- based on distance, 2 -- maxSpeed)
+            if (slowdown && distance < 100) {
+                // This damping is somewhat arbitrary:
+                desired.length = this.maxSpeed * (distance / 100);
+            } else {
+                desired.length = this.maxSpeed;
+            }
+            steer = desired - this.vector;
+            steer.length = Math.min(this.maxForce, steer.length);
+            return steer;
+        },
+
+        separate: function(boids) {
+            var desiredSeperation = 60;
+            var steer = new Point();
+            var count = 0;
+            // For every boid in the system, check if it's too close
+            for (var i = 0, l = boids.length; i < l; i++) {
+                var other = boids[i];
+                var vector = this.position - other.position;
+                var distance = vector.length;
+                if (distance > 0 && distance < desiredSeperation) {
+                    // Calculate vector pointing away from neighbor
+                    steer += vector.normalize(1 / distance);
+                    count++;
+                }
+            }
+            // Average -- divide by how many
+            if (count > 0)
+                steer /= count;
+            if (!steer.isZero()) {
+                // Implement Reynolds: Steering = Desired - Velocity
+                steer.length = this.maxSpeed;
+                steer -= this.vector;
+                steer.length = Math.min(steer.length, this.maxForce);
+            }
+            return steer;
+        },
+
+        // Alignment
+        // For every nearby boid in the system, calculate the average velocity
+        align: function(boids) {
+            var neighborDist = 25;
+            var steer = new Point();
+            var count = 0;
+            for (var i = 0, l = boids.length; i < l; i++) {
+                var other = boids[i];
+                var distance = this.position.getDistance(other.position);
+                if (distance > 0 && distance < neighborDist) {
+                    steer += other.vector;
+                    count++;
+                }
+            }
+
+            if (count > 0)
+                steer /= count;
+            if (!steer.isZero()) {
+                // Implement Reynolds: Steering = Desired - Velocity
+                steer.length = this.maxSpeed;
+                steer -= this.vector;
+                steer.length = Math.min(steer.length, this.maxForce);
+            }
+            return steer;
+        },
+
+        // Cohesion
+        // For the average location (i.e. center) of all nearby boids,
+        // calculate steering vector towards that location
+        cohesion: function(boids) {
+            var neighborDist = 100;
+            var sum = new Point();
+            var count = 0;
+            for (var i = 0, l = boids.length; i < l; i++) {
+                var other = boids[i];
+                var distance = this.position.getDistance(other.position);
+                if (distance > 0 && distance < neighborDist) {
+                    sum += other.position; // Add location
+                    count++;
+                }
+            }
+            if (count > 0) {
+                sum /= count;
+                // Steer towards the location
+                return this.steer(sum, false);
+            }
+            return sum;
+        }
+    });
+
+    var boids = [];
+    var groupTogether = false;
+
+    // Add the boids:
+    for (var i = 0; i < 30; i++) {
+        var position = Point.random() * view.size;
+        boids.push(new Boid(position, 10, 0.05));
+    }
+
+
+    function onFrame(event) {
+        for (var i = 0, l = boids.length; i < l; i++) {
+            boids[i].run(boids);
+        }
+    }
+
+    </script>
+    
+    <style>
+        body {
+            background: #e0d6f1;
+            overflow:hidden;
+            text-rendering: optimizeLegibility;
+             -webkit-font-smoothing: antialiased;
+             font-family: 'Spectral', serif;
+             width: 100%;
+        }
+
+        a.link_web{
+            color:black;
+            text-decoration: none;
+        }
+        a.link_vid:hover{
+            color:black;
+        }
+        a.link_vid{
+            color:white;
+            background: black;
+            padding:1px 4px 1px 4px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        a.link_vid:hover{
+            color:black;
+            background: white;
+            border: 1px solid black;
+        }
+
+        .big_div2{
+            position: absolute;
+            top:0px;
+
+            z-index: 100;
+            width: 100%;
+            height: 100%;
+        }
+
+        #photo_enlarge{
+            display: none;
+            width: 100%;
+            height:100%;
+            position: fixed;
+            top:0px;
+            left:0px;
+            z-index: 20000;
+        }
+        #photos_main{
+            margin: 0;
+            width: 60%;
+              position: fixed;
+              top: 50%;
+              left: 36%;
+              transform: translate(-36%, -50%) rotate(-24deg);
+              padding: 1%;
+              z-index: -1;
+        }
+        #photos_main2{
+            margin: 0;
+            width: 60%;
+              position: fixed;
+              top: 50%;
+              left: 36%;
+              transform: translate(-36%, -50%) rotate(-24deg);
+              padding: 1%;
+        }
+        .enlarged_photo{
+            width: 100%;
+        }
+
+        #main_bg{
+            width: 100%;
+        }
+        #main_layer{
+            width: 100%;
+        }
+        #canvas{
+            z-index: 50000;
+        }
+        #project_content2{
+            padding: 19px;
+            font-size: 12px;
+            font-weight: 500;
+            width: 20%;
+            position: absolute;
+            top:6%;
+            right:9%;
+            background: #e0d6f1;
+            border: 1px solid black;
+            height: fit-content;
+            display: none;
+        }
+        #desc{
+            width: 100%;
+            height:100%;
+            position: fixed;
+            top: 0px;
+            bottom: 0px;
+            display: none;
+            z-index: 60000;
+        }
+        .project_title2{
+            font-size: 32px;
+            font-weight: 500;
+        }
+        .small_menu{
+            padding-left: 14px;
+            display: none;
+        }
+        .submenu{
+            cursor : pointer;
+        }
+        
+        .back{
+            width:20px;
+            position: fixed;
+            top:0px;
+            left: 0px;
+            height:100%;
+            line-break:anywhere;
+            word-break: break-all;
+            font-size:9px;
+            z-index: 4000;
+        }
+        .back_link{
+            color:black;
+            text-decoration-line: none;
+        }
+        #shade_div{
+            background: #e0d6f1;
+            opacity: 1;
+            position: fixed;
+            top:0px;
+            left:0px;
+            width: 100%;
+            height:100%;
+            z-index: 100000;
+        }
+        .shade_animation{
+            animation-name: shade;
+            animation-duration: 1s;
+            animation-fill-mode: forwards;
+            animation-delay: 1s;
+        }
+        @keyframes shade {
+          from {opacity: 1;z-index: 100000;display: inherit;}
+          to {opacity: 0; z-index: -100;display: none;}
+        }
+        #table {
+
+            width: 100%;
+            border-collapse: collapse;
+            border-top: 1px solid black;
+            /*border-bottom: 1px solid black;*/
+        }
+        #table_div{
+            width: 100%;
+            /*display:none;*/
+            position:absolute;
+            bottom:0;
+            left:0;
+            font-size: 10px;
+            z-index: 30000;
+
+        }
+        th, td {
+          padding: 1px;
+          padding-left: 7px;
+          text-align: left;
+            border-bottom: 1px solid black; 
+        
+        }
+        tr:hover{
+            background-color: black;
+            color:white;
+        }
+        #project_img_container1{
+            display: none;
+            padding: 19px;
+            font-size: 12px;
+            font-weight: 500;
+            width: 16%;
+            position: absolute;
+            top:6%;
+            left:9%;
+            background: #e0d6f1;
+            border: 1px solid black;
+        }
+        #project_img_container2{
+            display: none;
+            padding: 19px;
+            font-size: 12px;
+            font-weight: 500;
+            width: 24%;
+            position: absolute;
+            bottom:26%;
+            left:4%;
+            background: #e0d6f1;
+            border: 1px solid black;
+            height: fit-content;
+        }
+        #project_img_container3{
+            display: none;
+            padding: 19px;
+            font-size: 12px;
+            font-weight: 500;
+            width: 30%;
+            position: absolute;
+            bottom:6%;
+            right:4%;
+            background: #e0d6f1;
+            border: 1px solid black;
+        }
+        .project_img{
+            width: 100%;
+        }
+        @media screen and (max-width: 600px) {
+
+            #table_div{
+                display: inherit;
+            }
+            #photos_main{
+            margin: 0;
+              position: fixed;
+              top: 0%;
+              left: 0%;
+              transform: inherit;
+              z-index: -1;
+              padding: 0%;
+              width: 100%;
+        }
+        #photos_main2{
+            margin: 0;
+              position: fixed;
+              top: 0%;
+              left: 0%;
+              transform: inherit;
+              z-index: 1000;
+              padding: 0%;
+              width: 100%;
+        }
+
+            .gal_prev{
+
+              left: 0%;
+              transform: rotate(-90deg) translate(50%, 5%);
+        }
+        .gal_next{
+
+              right: 0%;
+              transform: rotate(90deg) translate(-50%, 5%);
+        }
+
+            .enlarged_photo_div{
+
+            width: 80%;
+        }
+            body {
+            overflow-y:scroll;
+            overflow-x:hidden;
+           
+        }
+          .photos_popup{
+                width:100%;
+                margin-top: -40%;
+            }
+
+        #project_content2{
+            position: fixed;
+            bottom: 20%;
+            width: 75%;
+            padding: 24px;
+            font-size: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 60000;
+        }
+        #project_img_container1{
+            position: fixed;
+            bottom: 10%;
+            width: 50%;
+            padding: 24px;
+            font-size: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 60000;
+        }
+        #project_img_container2{
+            position: fixed;
+            bottom: 10%;
+            width: 72%;
+            padding: 24px;
+            font-size: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 60000;
+        }
+        #project_img_container3{
+            position: fixed;
+            bottom: 10%;
+            width: 70%;
+            padding: 24px;
+            font-size: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 60000;
+        }
+        .big_div2{
+            position: relative;
+            /*height: 100%;*/
+            width: 100%;
+            left: 0px;
+        }
+        #photo_stack{
+            margin-top: auto;
+            overflow: hidden;
+        }
+        
+        }
+    </style>
+</head>
+<body>
+
+        <div class="big_div2">
+
+        <div id="photos_main">
+        <img src="web_bgcolor.png" id="main_bg" />
+        </div>
+        <div id="photos_main2">
+        <img src="web_transparency-02.png" id="main_layer" />
+        </div>
+        <canvas id="canvas" resize>
+        </canvas>
+        
+        <div id="table_div">
+            <table id="table">
+            <tr>
+            <th>name</th>
+            <th>size</th>
+            <th>status</th>
+            <th>peers</th>
+          </tr>
+          <tr onclick="openDesc('project_content2',1)">
+            <td>sex.torrent</td>
+            <td>50.3MB</td>
+            <td>downloading</td>
+            <td>3</td>
+          </tr>
+          <tr onclick="openDesc('project_img_container1',2)">
+            <td>sex.torrent</td>
+            <td>108KB</td>
+            <td>downloading</td>
+            <td>9</td>
+          </tr>
+          <tr>
+            <td>sex.torrent</td>
+            <td>5.2MB</td>
+            <td>stopped</td>
+            <td>0</td>
+          </tr>
+          <tr onclick="openDesc('project_img_container2',4)">
+            <td>sex.torrent</td>
+            <td>1.3MB</td>
+            <td>completed</td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td>sex.torrent</td>
+            <td>50.3MB</td>
+            <td>ERROR</td>
+            <td>1</td>
+          </tr>
+          <tr onclick="openDesc('project_img_container3',6)">
+            <td>sex.torrent</td>
+            <td>50.3MB</td>
+            <td>completed</td>
+            <td>0</td>
+          </tr>
+        </table>
+        </div>
+        <div id="desc" onclick="descDismiss()">
+        <div id="project_content2">
+        <div class="project_title2">Torrents of Sex</div>/*
+
+        Assuming that someday human can upload and download their somatic sensations onto the web, Nahee.app designed peer-to-peer polyamorous sexual relationship network protocol &lt;Torrents of Sex&gt;, inspired by BitTorrent’s file distribution & peer selection algorithms.<br>
+        &lt;Torrents of Sex&gt; was exhibited at Our Networks 2019 and Cybernetics Library @ NY Art Book Fair 2019.
+*/
+<br><br>
+</div>
+
+<div id="project_img_container1">
+        <img src="web_desc_f1.png" class="project_img">
+</div>
+<div id="project_img_container2">
+        <img src="web_desc-f2.png" class="project_img">
+</div>
+<div id="project_img_container3">
+        <img src="web_desc_algo.png" class="project_img">
+</div>
+
+
+</div>   
+
+
+    </div>
+    <div class="back">
+<a href="Tadpoles.html" class="back_link">◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎</a>
+</div>
+<div id="shade_div"></div>
+    <script type="text/javascript">
+
+        //const container = document.querySelector('.project_content2');
+        var shade = document.getElementById("shade_div");
+        var photos_main = document.getElementById("photos_main");
+        var main_bg = document.getElementById("main_bg");
+        var main_layer = document.getElementById("main_layer");
+            shade.style.width = window.innerWidth +"px";
+            shade.style.height = window.innerHeight+"px";
+
+        const desc = document.getElementById('desc');
+        const table = document.getElementById('table_div');
+        desc.style.height = window.innerHeight - table.offsetHeight +"px";
+        if (window.innerWidth < 600){
+            main_bg.src = "web_bgcolor_90.png"
+            main_layer.src = "web_transparency-02_90.png"
+               // var v = container.offsetTop;
+                //v = v*(-1) + container.offsetHeight + 40 + 148;
+                // document.getElementsByClassName('big_div2')[0].style.height = v+"px";
+                // container.style.right = (window.innerWidth - container.offsetWidth)*0.5 + "px";
+                //container.style.top = window.innerHeight + 48 + "px";
+            }
+        function codeAddress() {
+            
+            shade.classList.add("shade_animation");
+            
+        }
+        window.onload = codeAddress;
+
+        function openSubSubMenu(n){
+            var small_menu = document.getElementsByClassName("small_menu")[n-1];
+            console.log(small_menu.style.display);
+            if (small_menu.style.display=="inherit"){
+                small_menu.style.display = "none";
+            }else{
+                small_menu.style.display = "inherit";
+            }
+        }
+        var checkerArr = [0,0,0,0,0,0];
+        var zIndex = 70000;
+        var idForDesc = ["project_content2","project_img_container1","project_img_container2","project_img_container3"];
+        function openDesc(cn, n){
+            const container = document.getElementById('desc');
+            
+
+            var selecetedRow = document.querySelectorAll('tr')[n];
+            
+            checkerArr[n] = !checkerArr[n];
+
+            if (checkerArr[n]){
+                selecetedRow.style.background ="black";
+                selecetedRow.style.color ="white";
+                container.style.display="inherit";
+                document.getElementById(cn).style.display = "inherit";
+                document.getElementById(cn).style.zIndex = zIndex;
+                zIndex = zIndex+1;
+
+            }else{
+                selecetedRow.style.background ="transparent";
+                selecetedRow.style.color ="black";
+                document.getElementById(cn).style.display = "none";
+            }
+
+        }
+
+        function descDismiss(){
+            const container = document.getElementById('desc');
+            container.style.display="none";
+            var selecetedRow = document.querySelectorAll('tr');
+            for (var i = 0; i < selecetedRow.length; i++) {
+                selecetedRow[i].style.background ="transparent";
+                selecetedRow[i].style.color ="black";
+            }
+            for (var j = 0; j < idForDesc.length; j++) {
+                document.getElementById(idForDesc[j]).style.display = "none";
+            }
+        }
+
+    </script>
+</body>
+</html>
