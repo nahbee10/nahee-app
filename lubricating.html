@@ -288,13 +288,6 @@
         var shade = document.getElementById("shade_div");
             shade.style.width = window.innerWidth +"px";
             shade.style.height = window.innerHeight+"px";
-        if (window.innerWidth < 600){
-                var v = container.offsetTop;
-                v = v*(-1) + container.offsetHeight + 40 + 148;
-                document.getElementsByClassName('big_div2')[0].style.height = v+"px";
-                container.style.right = (window.innerWidth - container.offsetWidth)*0.5 + "px";
-                container.style.top = window.innerHeight + 48 + "px";
-            }
         function codeAddress() {
             
             shade.classList.add("shade_animation");
