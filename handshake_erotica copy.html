@@ -7,11 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="shortcut icon" href="https://nahee.app/nk_favi.png" />
     <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300;1,400;1,500&display=swap" rel="stylesheet">
-
-    <script
-  src="https://code.jquery.com/jquery-3.5.1.min.js"
-  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-  crossorigin="anonymous"></script>
     
     <style>
         body {
@@ -63,15 +58,6 @@
         }
         #photos_main{
             margin: 0;
-            width: 100%;
-              position: absolute;
-              top: 50%;
-              right: 0%;
-              transform: translate(0%, -50%);
-              z-index: -1;
-        }
-        #photos_main2{
-            margin: 0;
             width: 70%;
               position: absolute;
               top: 50%;
@@ -79,19 +65,23 @@
               transform: translate(-50%, -50%);
               padding: 1%;
               z-index: -1;
-              display: none;
         }
-        #main_bg2{
-           width: auto;
-            height: 100%;
+        #photos_main2{
+            margin: 0;
+            width: 60%;
+              position: fixed;
+              top: 50%;
+              left: 36%;
+              /*transform: translate(-36%, -50%) rotate(-24deg);*/
+              padding: 1%;
         }
         .enlarged_photo{
             width: 100%;
         }
 
         #main_bg{
-           width: 100%;
-            height: 100%;
+           width: auto;
+            height: 120%;
         }
         #main_layer{
             width: 100%;
@@ -209,35 +199,13 @@
 
         }
 
-
-          .tile {
-            position: relative;
-            /*float: left;*/
-            height: 100%;
-            overflow: hidden;
-          }
-
-          .photo {
-/*            position: absolute;
-            top: 0;
-            left: 0;*/
-            width: 1500px;
-            height: 100%;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: cover;
-            transition: transform .5s ease-out;
-            /*transform : scale(1.2);*/
-            position: absolute;
-          }
-
         @media screen and (max-width: 600px) {
             #table_div{
                 width: 100%;
                 position:relative;
                 display: none;
             }
-            #photos_main2{
+            #photos_main{
             margin: 0;
               position: relative;
               top: 0%;
@@ -247,7 +215,7 @@
               padding: 0%;
               width: 100%;
         }
-        #main_bg2{
+        #main_bg{
             width: auto;
             height: 100%;
         }
@@ -296,10 +264,7 @@
 
         <div class="big_div2">
         <div id="photos_main">
-        <div class="tile" id="main_bg" data-scale="1.0" data-image="handshake_erotica.png"></div>
-        </div>
-        <div id="photos_main2">
-        <img src="handshake_erotica.png" id="main_bg2" />
+        <img src="handshake_erotica.png" id="main_bg" />
         </div>
         <div id="table_div">
             <table id="table">
@@ -334,6 +299,9 @@
         </table>
         </div>
         
+        <div id="photos_main2">
+        <img src="web_transparency-02.png" id="main_layer" style="display: none" />
+        </div>
         
 
         <div id="desc">
@@ -362,50 +330,20 @@
         //const container = document.querySelector('.project_content2');
         var shade = document.getElementById("shade_div");
         var photos_main = document.getElementById("photos_main");
-        var photos_main2 = document.getElementById("photos_main2");
         var main_bg = document.getElementById("main_bg");
         var main_layer = document.getElementById("main_layer");
             shade.style.width = window.innerWidth +"px";
             shade.style.height = window.innerHeight+"px";
         var table_div = document.getElementById("table_div");
         table_div.style.height = window.innerHeight + "px";
-        photos_main2.style.height = window.innerHeight + "px";
         photos_main.style.height = window.innerHeight + "px";
-        // main_bg.style.width = window.innerWidth * 0.5 + "px";
-        if (window.innerWidth < 600){
-            photos_main.style.display ="none";
-            photos_main2.style.display ="inherit";
-            }
+
         function codeAddress() {
             
             shade.classList.add("shade_animation");
             
         }
         window.onload = codeAddress;
-
-    </script>
-    <script type="text/javascript">
-    var offsety = (window.innerHeight * 1.5 - window.innerWidth*0.5)*0.5;
-          $('.tile')
-    // tile mouse actions
-    .on('mousemove', function(e){
-
-      $(this).children('.photo').css({'left': scale(e.pageX, window.innerWidth*0.5,window.innerWidth, offsety*(-1), offsety)*(-1)+'px'});
-
-    })
-    // tiles set up
-    .each(function(){
-      $(this)
-        // add a photo container
-        .append('<div class="photo"></div>')
-        .css({'left':(window.innerWidth*0.5 - offsety)+'px'})
-        // set up a background image for each tile based on data-image attribute
-        .children('.photo').css({'background-image': 'url('+ $(this).attr('data-image') +')', 'width': window.innerHeight * 1.5 +'px'});
-    })
-
-    const scale = (num, in_min, in_max, out_min, out_max) => {
-      return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-    }
 
     </script>
 </body>

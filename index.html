@@ -279,9 +279,24 @@
         var turnOffCheck = false;
         var isMobile = false;
 
-        var ran_angle1 = Math.random()* 2 * Math.PI/3;
-        var ran_angle2 = Math.random()* 2 * Math.PI/3 + 2 * Math.PI/3;
-        var ran_angle3 = Math.random()* 2 * Math.PI/3 + 4 * Math.PI/3;
+        var circle_size = 67.5;
+        var raster_scale = 0.2;
+
+        if (view.size.width <= 600){
+          circle_size = 50;
+          raster_scale = 0.15;
+        }
+
+        var circle_mask_size = circle_size -17.5;
+        var circle_orbit_size = circle_size -7.5;
+
+
+        var ran_angle1 = Math.random()* 2 * 2 * Math.PI/17;
+        var ran_angle2 = Math.random()* 2 * 2 * Math.PI/17 + 2*3 * Math.PI/17;
+        var ran_angle3 = Math.random()* 2 * 2 * Math.PI/17 + 2*6 * Math.PI/17;
+        var ran_angle4 = Math.random()* 2 * 2 * Math.PI/17 + 2*9 * Math.PI/17;
+        var ran_angle5 = Math.random()* 2 * 2 * Math.PI/17 + 2*12 * Math.PI/17;
+        var ran_angle6 = Math.random()* 2 * 2 * Math.PI/17 + 2*15 * Math.PI/17;
 
         var max_rad;
         var wh_ratio;
@@ -299,6 +314,9 @@
         var ran_radius1 = Math.random()*max_rad*0.5/4;
         var ran_radius2 = (Math.random()*max_rad*0.5/4) + max_rad*0.5*3/8;
         var ran_radius3 = (Math.random()*max_rad*0.5/4) + max_rad*0.5*3/4;
+        var ran_radius4 = Math.random()*max_rad*0.5/4 + max_rad*0.5*3/4
+        var ran_radius5 = (Math.random()*max_rad*0.5/4) + max_rad*0.5*3/8;
+        var ran_radius6 = (Math.random()*max_rad*0.5/4) + max_rad*0.5*3/4;
 
         
         var ranX1 = ran_radius1 * Math.cos(ran_angle1) + view.size.width*0.5;
@@ -344,8 +362,6 @@
         }
         var ranY3 = ran_radius3 * Math.sin(ran_angle3) + view.size.height*0.5;
 
-        console.log(ran_radius3);
-
         if (ranX3 > view.size.width-80){
          ranX3 = view.size.width-80;
         }
@@ -356,9 +372,56 @@
         //var ranX3 = (Math.random()*(view.size.width - 200)) + 100;
         //var ranY3 = (Math.random()*(view.size.height - 200)) + 100;
 
+        
+        var ranX4 = ran_radius4 * Math.cos(ran_angle4) + view.size.width*0.5;
+
+        if (isMobile){
+            ran_radius4 = ran_radius4*wh_ratio*0.8;
+        }
+        var ranY4 = ran_radius4 * Math.sin(ran_angle4) + view.size.height*0.5;
+
+        if (ranX4 > view.size.width-80){
+         ranX4 = view.size.width-80;
+        }
+        if (ranY4 > view.size.height-80){
+         ranY4 = view.size.height-80;
+        }
+
+
+        var ranX5 = ran_radius5 * Math.cos(ran_angle5) + view.size.width*0.5;
+
+        if (isMobile){
+            ran_radius5 = ran_radius5*wh_ratio*0.8;
+        }
+        var ranY5 = ran_radius5 * Math.sin(ran_angle5) + view.size.height*0.5;
+
+        if (ranX5 > view.size.width-80){
+         ranX5 = view.size.width-80;
+        }
+        if (ranY5 > view.size.height-80){
+         ranY5 = view.size.height-80;
+        }
+
+
+        var ranX6 = ran_radius6 * Math.cos(ran_angle6) + view.size.width*0.5;
+
+        if (isMobile){
+            ran_radius6 = ran_radius6*wh_ratio*0.8;
+        }
+        var ranY6 = ran_radius6 * Math.sin(ran_angle6) + view.size.height*0.5;
+
+        if (ranX6 > view.size.width-80){
+         ranX6 = view.size.width-80;
+        }
+        if (ranY6 > view.size.height-80){
+         ranY6 = view.size.height-80;
+        }
+
+
+
         /* handshake erotica */
 
-        var egg_outline_hs = new Path.Circle(point_hs, 67.5);
+        var egg_outline_hs = new Path.Circle(point_hs, circle_size);
         egg_outline_hs.dashArray = [3, 2];
         egg_outline_hs.strokeWidth = 1;
         egg_outline_hs.strokeColor = "black";
@@ -366,29 +429,35 @@
 
         var raster_hs = new Raster('handshakeErotica');
         raster_hs.position = point_hs;
-        raster_hs.scale(0.2);
+        raster_hs.scale(raster_scale);
 
-        var mask_hs = new Path.Circle(point_hs, 50);
+        var mask_hs = new Path.Circle(point_hs, circle_mask_size);
         mask_hs.fillColor = '#e9e9ff';
         mask_hs.selected = true;
 
         var group = new Group(mask_hs,raster_hs);
         group.clipped = true;
 
-        var cover_hs = new Path.Circle(point_hs, 50);
+        var cover_hs = new Path.Circle(point_hs, circle_mask_size);
         cover_hs.opacity = 1;
         cover_hs.fillColor = '#e0d6f1';
 
-        var orbit_hs = new Path.Circle(point_hs, 60);
+        var orbit_hs = new Path.Circle(point_hs, circle_orbit_size);
         orbit_hs.fillColor = '#e0d6f1';
         orbit_hs.opacity = 0.01;
         orbit_hs.onMouseEnter = function(event) {
-            egg_outline_hs.opacity = 1;
-            cover_hs.opacity = 0.1;
-            egg_outline_to.opacity = .01;
-            cover_to.opacity = 1;
+            egg_outline_lub.opacity = .01;
+            cover_lub.opacity = 1;
+            egg_outline_tt.opacity = .01;
+            cover_tt.opacity = 1;
+            egg_outline_ib.opacity = .01;
+            cover_ib.opacity = 1;
             egg_outline_dr.opacity = .01;
             cover_dr.opacity = 1;
+            egg_outline_to.opacity = .01;
+            cover_to.opacity = 1;
+            egg_outline_hs.opacity = 1;
+            cover_hs.opacity = .01;
             selectedPath = this;
             mouseMoveCheck = true;
             turnOffCheck = true;
@@ -414,18 +483,11 @@
              
         }
 
-        var text = new PointText(point_hs);
-        text.fillColor = 'black';
-        text.fontSize = '9px';
-
-        // Set the content of the text item:
-        //text.content = 'Handshake Erotica';
-
         /* handshake erotica */
 
         /* torrents of sex */
 
-        var egg_outline_to = new Path.Circle(point_to, 67.5);
+        var egg_outline_to = new Path.Circle(point_to, circle_size);
         egg_outline_to.dashArray = [3, 2];
         egg_outline_to.strokeWidth = 1;
         egg_outline_to.strokeColor = "black";
@@ -433,29 +495,35 @@
 
         var raster_to = new Raster('torrentsOfSex');
         raster_to.position = point_to;
-        raster_to.scale(0.2);
+        raster_to.scale(raster_scale);
 
-        var mask_to = new Path.Circle(point_to, 50);
+        var mask_to = new Path.Circle(point_to, circle_mask_size);
         mask_to.fillColor = '#e9e9ff';
         mask_to.selected = true;
 
         var group2 = new Group(mask_to,raster_to);
         group2.clipped = true;
 
-        var cover_to = new Path.Circle(point_to, 50);
+        var cover_to = new Path.Circle(point_to, circle_mask_size);
         cover_to.opacity = 1;
         cover_to.fillColor = '#e0d6f1';
 
-        var orbit_to = new Path.Circle(point_to, 60);
+        var orbit_to = new Path.Circle(point_to, circle_orbit_size);
         orbit_to.fillColor = '#e0d6f1';
         orbit_to.opacity = 0.01;
         orbit_to.onMouseEnter = function(event) {
-            egg_outline_to.opacity = 1;
-            cover_to.opacity = 0.1;
-            egg_outline_hs.opacity = .01;
-            cover_hs.opacity = 1;
+            egg_outline_lub.opacity = .01;
+            cover_lub.opacity = 1;
+            egg_outline_tt.opacity = .01;
+            cover_tt.opacity = 1;
+            egg_outline_ib.opacity = .01;
+            cover_ib.opacity = 1;
             egg_outline_dr.opacity = .01;
             cover_dr.opacity = 1;
+            egg_outline_to.opacity = 1;
+            cover_to.opacity = .01;
+            egg_outline_hs.opacity = .01;
+            cover_hs.opacity = 1;
             selectedPath = this;
             mouseMoveCheck = true;
             turnOffCheck = true;
@@ -484,7 +552,7 @@
 
         var point_dr = new Point(ranX3, ranY3);
 
-        var egg_outline_dr = new Path.Circle(point_dr, 67.5);
+        var egg_outline_dr = new Path.Circle(point_dr, circle_size);
         egg_outline_dr.dashArray = [3, 2];
         egg_outline_dr.strokeWidth = 1;
         egg_outline_dr.strokeColor = "black";
@@ -492,25 +560,31 @@
 
         var raster_dr = new Raster('daddyResidency');
         raster_dr.position = point_dr;
-        raster_dr.scale(0.2);
+        raster_dr.scale(raster_scale);
 
-        var mask_dr = new Path.Circle(point_dr, 50);
+        var mask_dr = new Path.Circle(point_dr, circle_mask_size);
         mask_dr.fillColor = '#e9e9ff';
         mask_dr.selected = true;
 
         var group3 = new Group(mask_dr,raster_dr);
         group3.clipped = true;
 
-        var cover_dr = new Path.Circle(point_dr, 50);
+        var cover_dr = new Path.Circle(point_dr, circle_mask_size);
         cover_dr.opacity = 1;
         cover_dr.fillColor = '#e0d6f1';
 
-        var orbit_dr = new Path.Circle(point_dr, 60);
+        var orbit_dr = new Path.Circle(point_dr, circle_orbit_size);
         orbit_dr.fillColor = '#e0d6f1';
         orbit_dr.opacity = 0.01;
         orbit_dr.onMouseEnter = function(event) {
+            egg_outline_lub.opacity = .01;
+            cover_lub.opacity = 1;
+            egg_outline_tt.opacity = .01;
+            cover_tt.opacity = 1;
+            egg_outline_ib.opacity = .01;
+            cover_ib.opacity = 1;
             egg_outline_dr.opacity = 1;
-            cover_dr.opacity = 0.1;
+            cover_dr.opacity = .01;
             egg_outline_to.opacity = .01;
             cover_to.opacity = 1;
             egg_outline_hs.opacity = .01;
@@ -538,6 +612,201 @@
         }
 
         /* daddy residency */
+
+        /* instant baby */
+
+        var point_ib = new Point(ranX4, ranY4);
+
+        var egg_outline_ib = new Path.Circle(point_ib, circle_size);
+        egg_outline_ib.dashArray = [3, 2];
+        egg_outline_ib.strokeWidth = 1;
+        egg_outline_ib.strokeColor = "black";
+        egg_outline_ib.opacity = 0;
+
+        var raster_ib = new Raster('instantBaby');
+        raster_ib.position = point_ib;
+        raster_ib.scale(raster_scale);
+
+        var mask_ib = new Path.Circle(point_ib, circle_mask_size);
+        mask_ib.fillColor = '#e9e9ff';
+        mask_ib.selected = true;
+
+        var group4 = new Group(mask_ib,raster_ib);
+        group4.clipped = true;
+
+        var cover_ib = new Path.Circle(point_ib, circle_mask_size);
+        cover_ib.opacity = 1;
+        cover_ib.fillColor = '#e0d6f1';
+
+        var orbit_ib = new Path.Circle(point_ib, circle_orbit_size);
+        orbit_ib.fillColor = '#e0d6f1';
+        orbit_ib.opacity = 0.01;
+        orbit_ib.onMouseEnter = function(event) {
+            egg_outline_lub.opacity = .01;
+            cover_lub.opacity = 1;
+            egg_outline_tt.opacity = .01;
+            cover_tt.opacity = 1;
+            egg_outline_ib.opacity = 1;
+            cover_ib.opacity = .01;
+            egg_outline_dr.opacity = .01;
+            cover_dr.opacity = 1;
+            egg_outline_to.opacity = .01;
+            cover_to.opacity = 1;
+            egg_outline_hs.opacity = .01;
+            cover_hs.opacity = 1;
+            selectedPath = this;
+            mouseMoveCheck = true;
+            turnOffCheck = true;
+            document.querySelector("canvas").style.cursor = "pointer";
+            //group3.bringToFront();
+        }
+
+        orbit_ib.onMouseLeave = function(event) {
+            egg_outline_ib.opacity = 0;
+            cover_ib.opacity = 1;
+            selectedPath = undefined;
+            mouseMoveCheck = false;
+            turnOffCheck = false;
+            document.querySelector("canvas").style.cursor = "default";
+            //group3.sendToBack();
+        }
+        orbit_ib.onClick = function(event) {
+             link="instant_baby.html";
+             createRect();
+             hs_test = true;
+        }
+
+        /* instant baby */
+
+        /* tactics */
+
+        var point_tt = new Point(ranX5, ranY5);
+
+        var egg_outline_tt = new Path.Circle(point_tt, circle_size);
+        egg_outline_tt.dashArray = [3, 2];
+        egg_outline_tt.strokeWidth = 1;
+        egg_outline_tt.strokeColor = "black";
+        egg_outline_tt.opacity = 0;
+
+        var raster_tt = new Raster('tactics');
+        raster_tt.position = point_tt;
+        raster_tt.scale(raster_scale);
+
+        var mask_tt = new Path.Circle(point_tt, circle_mask_size);
+        mask_tt.fillColor = '#e9e9ff';
+        mask_tt.selected = true;
+
+        var group5 = new Group(mask_tt,raster_tt);
+        group5.clipped = true;
+
+        var cover_tt = new Path.Circle(point_tt, circle_mask_size);
+        cover_tt.opacity = 1;
+        cover_tt.fillColor = '#e0d6f1';
+
+        var orbit_tt = new Path.Circle(point_tt, circle_orbit_size);
+        orbit_tt.fillColor = '#e0d6f1';
+        orbit_tt.opacity = 0.01;
+        orbit_tt.onMouseEnter = function(event) {
+            egg_outline_lub.opacity = .01;
+            cover_lub.opacity = 1;
+            egg_outline_tt.opacity = 1;
+            cover_tt.opacity = .01;
+            egg_outline_ib.opacity = .01;
+            cover_ib.opacity = 1;
+            egg_outline_dr.opacity = .01;
+            cover_dr.opacity = 1;
+            egg_outline_to.opacity = .01;
+            cover_to.opacity = 1;
+            egg_outline_hs.opacity = .01;
+            cover_hs.opacity = 1;
+            selectedPath = this;
+            mouseMoveCheck = true;
+            turnOffCheck = true;
+            document.querySelector("canvas").style.cursor = "pointer";
+            //group3.bringToFront();
+        }
+
+        orbit_tt.onMouseLeave = function(event) {
+            egg_outline_tt.opacity = 0;
+            cover_tt.opacity = 1;
+            selectedPath = undefined;
+            mouseMoveCheck = false;
+            turnOffCheck = false;
+            document.querySelector("canvas").style.cursor = "default";
+            //group3.sendToBack();
+        }
+        orbit_tt.onClick = function(event) {
+             link="tactics.html";
+             createRect();
+             hs_test = true;
+        }
+
+        /* tactics */
+
+        /* lubricating */
+
+        var point_lub = new Point(ranX6, ranY6);
+
+        var egg_outline_lub = new Path.Circle(point_lub, circle_size);
+        egg_outline_lub.dashArray = [3, 2];
+        egg_outline_lub.strokeWidth = 1;
+        egg_outline_lub.strokeColor = "black";
+        egg_outline_lub.opacity = 0;
+
+        var raster_lub = new Raster('lubricating');
+        raster_lub.position = point_lub;
+        raster_lub.scale(raster_scale);
+
+        var mask_lub = new Path.Circle(point_lub, circle_mask_size);
+        mask_lub.fillColor = '#e9e9ff';
+        mask_lub.selected = true;
+
+        var group6 = new Group(mask_lub,raster_lub);
+        group6.clipped = true;
+
+        var cover_lub = new Path.Circle(point_lub, circle_mask_size);
+        cover_lub.opacity = 1;
+        cover_lub.fillColor = '#e0d6f1';
+
+        var orbit_lub = new Path.Circle(point_lub, circle_orbit_size);
+        orbit_lub.fillColor = '#e0d6f1';
+        orbit_lub.opacity = 0.01;
+        orbit_lub.onMouseEnter = function(event) {
+            egg_outline_lub.opacity = 1;
+            cover_lub.opacity = 0.1;
+            egg_outline_tt.opacity = .01;
+            cover_tt.opacity = 1;
+            egg_outline_ib.opacity = .01;
+            cover_ib.opacity = 1;
+            egg_outline_dr.opacity = .01;
+            cover_dr.opacity = 1;
+            egg_outline_to.opacity = .01;
+            cover_to.opacity = 1;
+            egg_outline_hs.opacity = .01;
+            cover_hs.opacity = 1;
+            selectedPath = this;
+            mouseMoveCheck = true;
+            turnOffCheck = true;
+            document.querySelector("canvas").style.cursor = "pointer";
+            //group3.bringToFront();
+        }
+
+        orbit_lub.onMouseLeave = function(event) {
+            egg_outline_lub.opacity = 0;
+            cover_lub.opacity = 1;
+            selectedPath = undefined;
+            mouseMoveCheck = false;
+            turnOffCheck = false;
+            document.querySelector("canvas").style.cursor = "default";
+            //group3.sendToBack();
+        }
+        orbit_lub.onClick = function(event) {
+             link="lubricating.html";
+             createRect();
+             hs_test = true;
+        }
+
+        /* lubricating */
 
         
         function createRect(){
@@ -624,4 +893,4 @@
         function onResize(event) {
            // heartPath.fitBounds(view.bounds);
            // heartPath.scale(0.8);
-        }</script><style>body{background:#fff;overflow:hidden}#canvas{z-index:700}canvas[resize]{width:100%;height:100%}svg{z-index:600;position:absolute;top:30px;left:30px;fill:red}.circle{width:200px;height:200px;position:fixed;top:220px;left:400px;border-radius:120px;border:1px dashed #000;background:#e0d6f1;padding:20px}.s_circle{width:200px;height:200px;border-radius:100px;border:1px solid #000;background:#e0d6f1}.maskedImg{display:none}#shade_div{background:#e0d6f1;opacity:1;position:fixed;top:0;left:0;z-index:10000000;animation-name:shade;animation-duration:1s;animation-delay:.5s;animation-fill-mode:forwards}.shade_animation{animation-name:shade;animation-duration:1s;animation-delay:1s;animation-fill-mode:forwards}@keyframes shade{from{opacity:1;z-index:10000000}to{opacity:0;z-index:-100}}#intro{width:80%;height:80%;position:fixed;top:10%;left:10%;font-size:14px;opacity:0;animation-name:intro_shade;animation-duration:1s;animation-delay:.5s;animation-fill-mode:forwards}@keyframes intro_shade{from{opacity:0;display:none}to{opacity:1;display:inherit}}#back{width:18px;position:absolute;bottom:0;right:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;z-index:1000000}#insta{width:18px;position:absolute;bottom:0;left:0;line-break:anywhere;word-break:break-all;font-size:11px;cursor:pointer;z-index:1000000;line-height:9px}#github{width:18px;position:absolute;bottom:0;left:25px;line-break:anywhere;word-break:break-all;font-size:11px;cursor:pointer;z-index:1000000;line-height:9px}.back_link{color:#000;text-decoration-line:none}#edit{width:24px;position:absolute;bottom:0;right:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;display:none}#cv{width:25px;position:absolute;bottom:0;left:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;display:none}a{text-decoration:none;color:#000}</style><link href="/static/css/2.0ea46288.chunk.css" rel="stylesheet"><link href="/static/css/main.9f12e364.chunk.css" rel="stylesheet"></head><body style="background:#e0d6f1"><div id="root" style="height:100%"></div><script type="text/javascript">function codeAddress(){var e=document.getElementById("shade_div");e.style.width=window.innerWidth+"px",e.style.height=window.innerHeight+"px"}function closeIntro(){document.getElementById("intro").style.display="none",document.getElementById("edit").style.display="inherit",document.getElementById("cv").style.display="inherit"}function openIntro(){document.getElementById("intro").style.display="inherit",document.getElementById("edit").style.display="none",document.getElementById("cv").style.display="none"}window.addEventListener("pageshow",function(e){(e.persisted||void 0!==window.performance&&2===window.performance.navigation.type)&&window.location.reload()}),window.onload=codeAddress</script><script>!function(l){function e(e){for(var r,t,n=e[0],o=e[1],u=e[2],f=0,i=[];f<n.length;f++)t=n[f],p[t]&&i.push(p[t][0]),p[t]=0;for(r in o)Object.prototype.hasOwnProperty.call(o,r)&&(l[r]=o[r]);for(s&&s(e);i.length;)i.shift()();return c.push.apply(c,u||[]),a()}function a(){for(var e,r=0;r<c.length;r++){for(var t=c[r],n=!0,o=1;o<t.length;o++){var u=t[o];0!==p[u]&&(n=!1)}n&&(c.splice(r--,1),e=f(f.s=t[0]))}return e}var t={},p={1:0},c=[];function f(e){if(t[e])return t[e].exports;var r=t[e]={i:e,l:!1,exports:{}};return l[e].call(r.exports,r,r.exports,f),r.l=!0,r.exports}f.m=l,f.c=t,f.d=function(e,r,t){f.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},f.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},f.t=function(r,e){if(1&e&&(r=f(r)),8&e)return r;if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;var t=Object.create(null);if(f.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var n in r)f.d(t,n,function(e){return r[e]}.bind(null,n));return t},f.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return f.d(r,"a",r),r},f.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},f.p="/";var r=window.webpackJsonp=window.webpackJsonp||[],n=r.push.bind(r);r.push=e,r=r.slice();for(var o=0;o<r.length;o++)e(r[o]);var s=n;a()}([])</script><script src="/static/js/2.ef421ff0.chunk.js"></script><script src="/static/js/main.d971d30c.chunk.js"></script></body></html>
+        }</script><style>body{background:#fff;overflow:hidden}#canvas{z-index:700}canvas[resize]{width:100%;height:100%}svg{z-index:600;position:absolute;top:30px;left:30px;fill:red}.circle{width:200px;height:200px;position:fixed;top:220px;left:400px;border-radius:120px;border:1px dashed #000;background:#e0d6f1;padding:20px}.s_circle{width:200px;height:200px;border-radius:100px;border:1px solid #000;background:#e0d6f1}.maskedImg{display:none}#shade_div{background:#e0d6f1;opacity:1;position:fixed;top:0;left:0;z-index:10000000;animation-name:shade;animation-duration:1s;animation-delay:.5s;animation-fill-mode:forwards}#shade_ascii_div{width:80%;height:20%;position:absolute;top:35%;left:10%;font-size:14px;z-index:9000000;display:none}.shade_animation{animation-name:shade;animation-duration:1s;animation-delay:1s;animation-fill-mode:forwards}@keyframes shade{from{opacity:1;z-index:10000000}to{opacity:0;z-index:-100}}#intro{width:80%;height:80%;position:fixed;top:10%;left:10%;font-size:14px;opacity:0;animation-name:intro_shade;animation-duration:1s;animation-delay:.5s;animation-fill-mode:forwards}#tab{width:5%;padding:5px;border:.5px solid #000;border-bottom:none;border-top-left-radius:4px;border-top-right-radius:4px;margin-bottom:14px;opacity:0;font-size:10px}@keyframes intro_shade{from{opacity:0;display:none}to{opacity:1;display:inherit}}#back{width:18px;position:absolute;bottom:0;right:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;z-index:1000000}#insta{width:18px;position:absolute;bottom:0;left:0;line-break:anywhere;word-break:break-all;font-size:11px;cursor:pointer;z-index:1000000;line-height:9px}#github{width:18px;position:absolute;bottom:0;left:25px;line-break:anywhere;word-break:break-all;font-size:11px;cursor:pointer;z-index:1000000;line-height:9px}.back_link{color:#000;text-decoration-line:none}#edit{width:24px;position:absolute;bottom:0;right:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;display:none}#cv{width:25px;position:absolute;bottom:0;left:0;line-break:anywhere;word-break:break-all;font-size:9px;cursor:pointer;display:none}a{text-decoration:none;color:#000}</style><link href="/static/css/2.0ea46288.chunk.css" rel="stylesheet"><link href="/static/css/main.9f12e364.chunk.css" rel="stylesheet"></head><body style="background:#e0d6f1"><div id="root" style="height:100%"></div><script type="text/javascript">function codeAddress(){var e=document.getElementById("shade_div");e.style.width=window.innerWidth+"px",e.style.height=window.innerHeight+"px";for(var n=document.getElementById("shade_ascii_div"),t="//* */",d=0;d<1100;d++)t+="/* */";n.innerHTML=t}function closeIntro(){document.getElementById("intro").style.display="none",document.getElementById("edit").style.display="inherit",document.getElementById("cv").style.display="inherit"}function openIntro(){document.getElementById("intro").style.display="inherit",document.getElementById("edit").style.display="none",document.getElementById("cv").style.display="none"}window.addEventListener("pageshow",function(e){(e.persisted||void 0!==window.performance&&2===window.performance.navigation.type)&&window.location.reload()}),window.onload=codeAddress</script><script>!function(l){function e(e){for(var r,t,n=e[0],o=e[1],u=e[2],f=0,i=[];f<n.length;f++)t=n[f],p[t]&&i.push(p[t][0]),p[t]=0;for(r in o)Object.prototype.hasOwnProperty.call(o,r)&&(l[r]=o[r]);for(s&&s(e);i.length;)i.shift()();return c.push.apply(c,u||[]),a()}function a(){for(var e,r=0;r<c.length;r++){for(var t=c[r],n=!0,o=1;o<t.length;o++){var u=t[o];0!==p[u]&&(n=!1)}n&&(c.splice(r--,1),e=f(f.s=t[0]))}return e}var t={},p={1:0},c=[];function f(e){if(t[e])return t[e].exports;var r=t[e]={i:e,l:!1,exports:{}};return l[e].call(r.exports,r,r.exports,f),r.l=!0,r.exports}f.m=l,f.c=t,f.d=function(e,r,t){f.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},f.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},f.t=function(r,e){if(1&e&&(r=f(r)),8&e)return r;if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;var t=Object.create(null);if(f.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var n in r)f.d(t,n,function(e){return r[e]}.bind(null,n));return t},f.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return f.d(r,"a",r),r},f.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},f.p="/";var r=window.webpackJsonp=window.webpackJsonp||[],n=r.push.bind(r);r.push=e,r=r.slice();for(var o=0;o<r.length;o++)e(r[o]);var s=n;a()}([])</script><script src="/static/js/2.ef421ff0.chunk.js"></script><script src="/static/js/main.bce696b7.chunk.js"></script></body></html>
