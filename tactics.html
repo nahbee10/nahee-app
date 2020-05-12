@@ -307,25 +307,43 @@
     <script type="text/javascript">
         var enlarge_div = document.getElementById('photo_enlarge');
         var tactics_div = document.getElementById('tactics_container');
+        var tactics_nav = document.getElementById('tactics_navi');
+        var big_div = document.getElementsByClassName('big_div2')[0];
         const container = document.querySelector('.project_content2');
         var shade = document.getElementById("shade_div");
             shade.style.width = window.innerWidth +"px";
             shade.style.height = window.innerHeight+"px";
         tactics_div.style.width = window.innerHeight * 3 +10 + "px";
         tactics_div.style.height = window.innerHeight + "px";
+        var scr = (window.innerHeight * 3 + 10)*0.5 - window.innerWidth*0.5 -5;
 
         function codeAddress() {
             
             shade.classList.add("shade_animation");
-            var scr = (window.innerHeight * 3 + 10)*0.5 - window.innerWidth*0.5 -5;
+            
             // console.log(scr);
             // window.scrollTo(scr,0);
-            document.getElementsByClassName('big_div2')[0].scrollLeft = scr;
+            big_div.scrollLeft = scr;
             
         }
         // var scr = (window.innerHeight * 3 + 10)*0.25;
         // window.scrollTo(scr,0);
         window.onload = codeAddress;
+
+        big_div.addEventListener('scroll', function(e) {
+            console.log(scr);
+            console.log(big_div.scrollLeft);
+          if (scr>big_div.scrollLeft+1){
+
+            tactics_nav.style.left="4%";
+            tactics_nav.style.right="auto";
+          }else{
+            tactics_nav.style.right="4%";
+            tactics_nav.style.left="auto";
+          }
+
+          
+        });
 
 
     </script>
