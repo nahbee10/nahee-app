@@ -11,7 +11,8 @@
     <style>
         body {
             background: #d8e5f4;
-            overflow:hidden;
+            overflow-x: scroll;
+            overflow-y: hidden;
             text-rendering: optimizeLegibility;
              -webkit-font-smoothing: antialiased;
              font-family: 'Spectral', serif;
@@ -39,11 +40,14 @@
         }
 
         .big_div2{
-            position: absolute;
+            position: fixed;
             top:0px;
-            left:14%;
-            z-index: 100;
-            width: 86%;
+            left:0px;
+
+            width: 100%;
+            height: 100%;
+            overflow-x: scroll;
+            overflow-y: hidden;
         }
 
         #photo_enlarge{
@@ -185,16 +189,23 @@
 
         #ib{
         	height: 100%;
-        	position: fixed;
-        	top:50%;
+        	position: relative;
+        	/*top:50%;
         	left:50%;
-        	transform: translate(-50%,-50%);
+        	transform: translate(-50%,-50%);*/
         }
         #ib_container{
         	width: 100%;
         	height:100%;
         	filter: blur(8px);
  			 -webkit-filter: blur(8px);
+        }
+        #tactics_container{
+            height: 100%;
+/*            position: absolute;
+            top:50%;
+            left:50%;
+            transform: translate(-50%,-50%);*/
         }
         #under_text{
         	position: fixed;
@@ -203,7 +214,20 @@
         	transform: translate(-50%,-50%);
         	font-size: 19px;
         }
+        #tactics_navi{
+            position: fixed;
+            bottom:4%;
+            right:4%;
+            width: 7%;
+        }
+        #tactics_navi_img{
+            width: 100%;
+        }
         @media screen and (max-width: 600px) {
+            #tactics_navi{
+
+            width: 15%;
+        }
         	.under{
         	width:85%;
         	height:48%;
@@ -264,35 +288,43 @@
 
     <div class="big_div2">
 
-        <div id="photo_stack">
-
-
         	<div id="tactics_container">
-        	<img src="tactics3.png" id="ib">
+        	<img src="tactics01.png" id="ib">
+            <img src="tactics03.png" id="ib">
+            <img src="tactics02.png" id="ib">
         	</div>
-        	<div id="under_text">under construction</div>
+            <div id="tactics_navi"><img src="tactics_symbol.png" id="tactics_navi_img"></div>
+        	<div id="under_text">tactics</div>
 
    
 <div class="back">
 <a href="../" class="back_link">◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎◀︎</a>
 </div>
 
-
-        </div>
     </div>
 
     <div id="shade_div"></div>
     <script type="text/javascript">
         var enlarge_div = document.getElementById('photo_enlarge');
+        var tactics_div = document.getElementById('tactics_container');
         const container = document.querySelector('.project_content2');
         var shade = document.getElementById("shade_div");
             shade.style.width = window.innerWidth +"px";
             shade.style.height = window.innerHeight+"px";
+        tactics_div.style.width = window.innerHeight * 3 +10 + "px";
+        tactics_div.style.height = window.innerHeight + "px";
+
         function codeAddress() {
             
             shade.classList.add("shade_animation");
+            var scr = (window.innerHeight * 3 + 10)*0.5 - window.innerWidth*0.5 -5;
+            // console.log(scr);
+            // window.scrollTo(scr,0);
+            document.getElementsByClassName('big_div2')[0].scrollLeft = scr;
             
         }
+        // var scr = (window.innerHeight * 3 + 10)*0.25;
+        // window.scrollTo(scr,0);
         window.onload = codeAddress;
 
 
