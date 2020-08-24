@@ -79,7 +79,8 @@ var Dots = (function() {
 			    autoplay: true,
 			    loop: true,
 			});;
-
+			$('#video_wrapper2').attr('playsinline','');
+			elem2.attr('playsinline',''); 
     		$(opts.selector).append(elem);
     		elem.append(elem2);
     		// $(opts.selector).append(video);
