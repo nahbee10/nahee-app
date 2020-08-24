@@ -49,10 +49,16 @@ var Dots = (function() {
 
     	$(opts.selector).css({'width': opts.width,'height': opts.height,'overflow':'hidden'});
 
+    	var floatWidth = 360;
+    	var floatHeight = 100;
 
+    	if (window.innerWidth > 1920){
+    		floatWidth = 540;
+    		floatHeight = 150;
+    	}
     	var styles = {
-    		'width': 360 + 'px',
-    		'height': 100 + 'px', 
+    		'width': floatWidth + 'px',
+    		'height': floatHeight + 'px', 
     		'position': 'absolute'
     	}
 
