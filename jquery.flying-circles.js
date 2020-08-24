@@ -97,8 +97,6 @@ var Dots = (function() {
 	    	top_destination = (options.height <= 0) ? parseInt(options.height) : randomize(options.height, 1);
 	    	left_destination = (options.width <= 0) ? parseInt(options.width) : randomize(options.width, 1);
 
-	    	console.log(move_speed);
-
 	        $(item).css("background-color", 'transparent').animate({
 	        	backgroundColor: '#000000',
 	        	top: top_destination,
