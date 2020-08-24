@@ -49,12 +49,12 @@ var Dots = (function() {
 
     	$(opts.selector).css({'width': opts.width,'height': opts.height,'overflow':'hidden'});
 
-    	var floatWidth = 360;
-    	var floatHeight = 100;
+    	var floatWidth = 300;
+    	var floatHeight = 150;
 
     	if (window.innerWidth > 1920){
-    		floatWidth = 540;
-    		floatHeight = 150;
+    		floatWidth = 500;
+    		floatHeight = 200;
     	}
     	var styles = {
     		'width': floatWidth + 'px',
@@ -66,10 +66,22 @@ var Dots = (function() {
 
 			elem = $('<div/>', {
 						class: 'circle',
-						style: 'top:'+randomize(opts.height, 0)+'px;left:'+randomize(opts.width, 0)+'px;'+'background-image:url("comingsoon_arita.png");background-size: contain;background-repeat: no-repeat;'
+						style: 'top:'+randomize(opts.height, 0)+'px;left:'+randomize(opts.width, 0)+'px;'
 				   });
+			elem2 = $('<video />', {
+			    id: 'video_wrapper2',
+			    src: 'https://lapses.s3.ap-northeast-2.amazonaws.com/prism/comingsoon.mp4',
+			    type: 'video/mp4',
+			    controls: false
+			}).prop({
+			    muted: true,
+			    autoplay: true,
+			    loop: true,
+			});;
 
     		$(opts.selector).append(elem);
+    		elem.append(elem2);
+    		// $(opts.selector).append(video);
     		$('.' + elem[0].className).css(styles);
     		anim( elem );
 
