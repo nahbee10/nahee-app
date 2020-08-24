@@ -70,10 +70,11 @@ var Dots = (function() {
 				   });
 			elem2 = $('<video />', {
 			    id: 'video_wrapper2',
-			    src: 'https://lapses.s3.ap-northeast-2.amazonaws.com/prism/comingsoon.mp4',
+			    src: 'https://lapses.s3.ap-northeast-2.amazonaws.com/prism/comingsoon_s.mp4',
 			    type: 'video/mp4',
 			    controls: false
 			}).prop({
+				playsinline: true,
 			    muted: true,
 			    autoplay: true,
 			    loop: true,
