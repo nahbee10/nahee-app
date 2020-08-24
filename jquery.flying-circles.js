@@ -93,10 +93,11 @@ var Dots = (function() {
 
     var anim = function( item ){
 
-	    	move_speed = (options.speed <= 0) ? parseInt(options.speed) : randomize(options.speed, Math.floor(options.speed / 5));
+	    	move_speed = (options.speed <= 0) ? parseInt(options.speed) : randomize(Math.floor(options.speed / 3), Math.floor(options.speed / 5));
 	    	top_destination = (options.height <= 0) ? parseInt(options.height) : randomize(options.height, 1);
 	    	left_destination = (options.width <= 0) ? parseInt(options.width) : randomize(options.width, 1);
 
+	    	console.log(move_speed);
 
 	        $(item).css("background-color", 'transparent').animate({
 	        	backgroundColor: '#000000',
