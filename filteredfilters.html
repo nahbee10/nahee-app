@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" crossorigin="anonymous"></script>
+	<style>
+		body,html {
+			padding: 0;
+			margin: 0;
+		}
+		body {background: white}
+		.wrapper{
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			top: 0;
+			left:0;
+		}
+		.title{
+			width: 100%;
+			height: 100%;
+		}
+		.moving-circles{
+			position:absolute;
+			top:0;
+			left:0;
+		}
+
+	</style>
+</head>
+<body>
+<div class="wrapper">
+	<img src="filteredfilters.png"  class="title" />
+</div>
+<div class="title_text">
+	<img src="filteredfilters_text.png"  class="title" />
+</div>
+<script>
+$(function(){
+		Dots.generate({speed: 10000});
+	 });
+	</script>
+<script src="jquery.flying-circles.js"></script>
+</body>
+</html>
